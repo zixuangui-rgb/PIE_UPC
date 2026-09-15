@@ -45,22 +45,29 @@ h1 em { color: var(--blue); font-weight: 400; letter-spacing: -.02em; }
 }
 
 @media (max-width: 720px) {
+  .page { --mobile-gutter: 24px; padding-inline: var(--mobile-gutter); }
   .masthead { min-height: 86px; }
   .wordmark { font-size: 28px; }
   .location { font-size: 12px; letter-spacing: .12em; }
-  .hero { min-height: auto; grid-template-columns: 1fr; gap: 36px; padding: 24px 0 28px; }
-  .hero-copy { padding: 0; }
+  .hero { position: relative; isolation: isolate; min-height: max(600px, calc(100svh - 86px)); grid-template-columns: 1fr; align-items: start; gap: 0; padding: 32px 0 48px; }
+  .hero-copy { padding: 0; animation: none; }
   .eyebrow { font-size: 13px; letter-spacing: .11em; margin-bottom: 24px; }
   h1 { font-size: clamp(58px, 13.5vw, 94px); line-height: .99; }
   .welcome { font-size: 20px; margin-top: 26px; }
-  .paris-visual { min-height: 0; height: 390px; max-height: none; border-radius: 46% 46% 3px 3px; }
+  .welcome strong { display: block; }
+  .paris-visual { position: absolute; z-index: -1; inset: 0 calc(-1 * var(--mobile-gutter)); height: 100%; border-radius: 0; animation: none; }
   .paris-visual img { object-position: 55% 0%; }
+  .paris-visual::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, var(--paper) 0%, rgb(248 250 255 / .7) 18%, rgb(248 250 255 / 0) 56%), linear-gradient(90deg, rgb(248 250 255 / .96) 0%, rgb(248 250 255 / .85) 28%, rgb(248 250 255 / .12) 76%, rgb(248 250 255 / 0) 100%); }
+}
+
+@media (max-width: 720px) and (prefers-reduced-motion: no-preference) {
+  .hero { animation: appear .9s ease-out both; }
 }
 
 @media (max-width: 360px) {
-  .page { padding-inline: 20px; }
+  .page { --mobile-gutter: 20px; }
   h1 { font-size: 54px; }
   .welcome { font-size: 18px; }
   .eyebrow { font-size: 12px; }
-  .paris-visual { height: 330px; }
+  .paris-visual img { object-position: 40% 0%; }
 }
