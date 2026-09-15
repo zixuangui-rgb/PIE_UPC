@@ -11,14 +11,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./community.css" />
+    <script src="./main.js" defer></script>
   </head>
-  <body>
+  <body id="top">
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <div class="page">
       <header class="masthead">
         <span class="wordmark" aria-label="PIE">PIE<span class="wordmark-line" aria-hidden="true"></span></span>
         <span class="location">PARIS, FRANCE</span>
       </header>
-      <main>
+      <main id="main-content">
         <section class="hero" aria-labelledby="hero-title">
           <div class="hero-copy">
             <p class="eyebrow">FOR INTERNATIONAL STUDENTS</p>
@@ -28,8 +31,61 @@
           <figure class="paris-visual">
             <img src="./assets/paris-editorial.webp" alt="An editorial view of the Eiffel Tower above the rooftops of Paris" width="1122" height="1402" fetchpriority="high" decoding="async" />
           </figure>
+          <a class="scroll-cue" href="#discover">
+            <span class="scroll-cue-arrow" aria-hidden="true">↓</span>
+            <span>Explore the community</span>
+          </a>
+        </section>
+
+        <section class="discover" id="discover" aria-labelledby="discover-title">
+          <header class="discover-heading">
+            <div>
+              <p class="section-kicker">A LITTLE CLOSER TO YOUR PIE WORLD</p>
+              <h2 id="discover-title">Three ways to feel at home.</h2>
+            </div>
+            <p class="demo-note">Demo content<br />People, events and stories below are fictional examples.</p>
+          </header>
+
+          <div class="gateway-grid">
+            <article class="gateway gateway--members" data-reveal>
+              <p class="gateway-number">01 / THE PEOPLE</p>
+              <h3>Members</h3>
+              <p class="gateway-description">A familiar face is a good place to start.</p>
+              <div class="gateway-preview member-preview" aria-label="Example members">
+                <div class="preview-person"><span class="preview-avatar avatar--lina" aria-hidden="true">LM</span><div><strong>Lina Moreau</strong><span>Welcome buddy</span></div></div>
+                <div class="preview-person"><span class="preview-avatar avatar--mateo" aria-hidden="true">MS</span><div><strong>Mateo Silva</strong><span>Event volunteer</span></div></div>
+                <div class="preview-person"><span class="preview-avatar avatar--aya" aria-hidden="true">AT</span><div><strong>Aya Tanaka</strong><span>Community member</span></div></div>
+              </div>
+              <a class="gateway-link" href="./members.html">Meet the community <span aria-hidden="true">↗</span></a>
+            </article>
+
+            <article class="gateway gateway--events" data-reveal>
+              <p class="gateway-number">02 / THE PLANS</p>
+              <h3>Events</h3>
+              <p class="gateway-description">Good company. A reason to get together.</p>
+              <div class="gateway-preview event-preview">
+                <div class="preview-event-top"><time datetime="2026-09-24"><strong>24</strong><span>SEP</span></time><span class="preview-event-type">COFFEE & CONVERSATION</span></div>
+                <p class="preview-event-title">Coffee &<br />first hellos.</p>
+                <p class="preview-event-meta">17:30 · A café near campus</p>
+              </div>
+              <a class="gateway-link" href="./events.html">Explore upcoming events <span aria-hidden="true">↗</span></a>
+            </article>
+
+            <article class="gateway gateway--experiences" data-reveal>
+              <p class="gateway-number">03 / THE STORIES</p>
+              <h3>Experiences</h3>
+              <p class="gateway-description">A new city, seen through familiar eyes.</p>
+              <div class="gateway-preview experience-preview">
+                <span class="preview-quote-mark" aria-hidden="true">“</span>
+                <blockquote>Paris started feeling smaller the moment I had someone to say hello to.</blockquote>
+                <p class="preview-story-author"><span class="story-author-dot" aria-hidden="true">AT</span><span>Aya Tanaka<span>Finding my first familiar faces</span></span></p>
+              </div>
+              <a class="gateway-link" href="./experiences.html">Read their stories <span aria-hidden="true">↗</span></a>
+            </article>
+          </div>
         </section>
       </main>
+      <footer class="site-footer"><span>PIE · Paris International Exchange</span><a href="#top">Back to top <span aria-hidden="true">↑</span></a></footer>
     </div>
   </body>
 </html>
