@@ -41,6 +41,7 @@ Open `http://localhost:8000/`.
 | `docs/expanded-*-image-prompts.md` | Prompts and provenance for the expanded demo content |
 | `docs/doubled-*-image-prompts.md` | Prompts and provenance for the second content expansion |
 | `docs/demo-content-guidelines.md` | Plausibility and consistency rules for demo profiles, events and stories |
+| `docs/real-photo-sources.md` | Sources and conversion notes for the real photos replacing some demo images |
 | `scripts/version_assets.py` | Adds content-based CSS/JS version URLs to staged pages |
 | `.github/workflows/pages.yml` | Automatic GitHub Pages deployment |
 
