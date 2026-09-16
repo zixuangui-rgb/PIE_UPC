@@ -9,8 +9,8 @@ These are **AI-generated photographic illustrations**. People and scenes are fic
 - Mode: built-in `image_gen.imagegen`; new-image generation, three independent calls with no reference images. No CLI fallback or external image API.
 - All three new sources were generated at 1499 × 1049 pixels, copied into the workspace with full-frame proportional resizing, and encoded as 800 × 560 WebP (quality 82, method 6).
 - Pillow performed only resizing and format encoding, with no semantic image editing or cropping. Source PNG files remain at the original paths.
-- Two earlier generated WebP files were restored byte-for-byte from commit `f336934`; no image edits were made to these reused files.
-- All five final files were visually inspected for scene fit, framing, obvious anatomy artifacts, and unwanted text or branding.
+- Three earlier generated WebP files were restored byte-for-byte from commit `f336934`; no image edits were made to these reused files.
+- All six final files were visually inspected for scene fit, framing, obvious anatomy artifacts, and unwanted text or branding.
 
 ## Final assets
 
@@ -18,9 +18,10 @@ Paths are relative to the repository root `/Users/hell/AIRE_Study/PIE_UPC`.
 
 | Asset | Dimensions | Bytes | Intended use |
 |---|---|---:|---|
-| `assets/event-coffee.webp` | 1000 × 750 | 88,568 | Coffee event and first-familiar-faces story |
+| `assets/event-coffee.webp` | 1000 × 750 | 88,568 | Coffee event only |
 | `assets/event-seine-walk.webp` | 800 × 560 | 65,964 | Seine walk event |
 | `assets/event-language-cafe.webp` | 800 × 560 | 45,714 | Language café event |
+| `assets/story-familiar-faces.webp` | 1000 × 750 | 92,500 | First-familiar-faces story only |
 | `assets/story-paris-routine.webp` | 1000 × 750 | 53,346 | Paris routine story |
 | `assets/story-volunteering.webp` | 800 × 560 | 48,856 | Volunteering story |
 
@@ -78,6 +79,7 @@ Constraints: visibly adult students, nobody posing or looking at the camera, no 
 
 The following records are copied from `f336934:docs/image-prompts.md`. The historical asset paths in the source records are intentionally preserved.
 
+- `f336934:assets/members-community.webp` is now `assets/story-familiar-faces.webp`.
 - `f336934:assets/events-coffee.webp` is now `assets/event-coffee.webp`.
 - `f336934:assets/experiences-paris.webp` is now `assets/story-paris-routine.webp`.
 - Original generation date: 2026-09-16; built-in `image_gen.imagegen`, new images without references.
@@ -121,4 +123,22 @@ Scene: an outdoor café table in Paris with a softly focused riverside and pale 
 Subject: one adult international student in their early twenties, seen from over their shoulder, quietly writing in a small open cream notebook beside a ceramic coffee cup. The person is secondary but visible, wearing a simple muted sage jacket. Close editorial composition focusing on the notebook, hand holding a pen naturally, cup and the lived-in city atmosphere. Notebook pages have only indistinct nonverbal pen marks, absolutely no readable text. Soft morning daylight, intimate everyday personal travel journal mood, matte surfaces and gentle depth of field. No Eiffel Tower necessary, no exaggerated tourist postcard appearance.
 ```
 
+### Earlier members-community record
 
+
+- Generation mode: built-in tool, new image.
+- Source PNG: `/Users/hell/.codex/generated_images/01a0a91b-70a8-73d1-aaa1-458f8d2fb8f4/exec-943a98be-4bae-401a-a919-be8797377dfa.png`
+- Final web asset: `assets/members-community.webp`
+- Original size: 1448 × 1086 px.
+
+#### Exact prompt
+
+```text
+Use case: photorealistic-natural.
+Asset type: landscape 4:3 photographic illustration for a Paris international student community website, no typography.
+Art direction: natural candid editorial lifestyle photography, like a carefully photographed student journal. Adult students in their early twenties. Soft daylight, believable expressions, real skin texture, subtly worn materials, modest everyday clothing. Cohesive muted slate-blue, cream, sage and soft ochre palette. Slight natural grain, not exaggerated vintage.
+Composition: central subjects safe for web cropping; readable at a small website card size.
+Constraints: fictional illustrative scene, no real organization branding. No words, readable text, watermarks, logos, university signage. No camera-facing posed gaze, no hyperpolished corporate stock-photo look, no oversaturated sheen, no surreal elements. Natural correct anatomy and hands.
+Scene: outside a Paris university courtyard beside pale limestone steps, soft overcast daylight.
+Subject: exactly four adult international students of varied backgrounds having a relaxed friendly conversation, one sitting on the steps and three close beside them at the same level. Medium shot with all four faces clearly legible near the center, genuine listening and small smiles, one person talking. Simple clothing in slate blue, cream and sage, a modest canvas tote resting nearby. Natural hands at rest, no elaborate gestures. A softly focused stone courtyard and a little greenery establish Paris without an obvious monument. Welcoming, unposed everyday social connection.
+```

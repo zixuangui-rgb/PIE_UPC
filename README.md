@@ -7,8 +7,9 @@ The homepage keeps the original Paris hero and adds a scroll guide to three para
 ## Content and interaction
 
 - Members: six fictional profiles with small AI-generated portraits grouped with names, roles and Active/Alumni status. Languages, interests and clearly labeled example email addresses remain below. Example emails use `example.com` and are display-only placeholders.
-- Events: three fictional activities with dates, locations and small scene images. On phones, the date and image share a row above the full-width description.
-- Experiences: three fictional stories presented as wide article rows with supporting photos and native expand/collapse controls.
+- Events: three fictional activities with dates, locations and landscape scenes. The date sits in a solid badge over each photo, paired with the activity description; phones place the media above the text.
+- Experiences: three fictional stories presented as wide article rows with photos alongside grouped titles, bylines and summaries, plus native expand/collapse controls. Phones show the photo as the top of the same story card.
+- Each activity and story has its own image; no image is shared between the Events and Experiences pages.
 - All invented content is visibly labeled as demo content; there are no real contact or registration actions.
 - The three homepage gateways reveal on scroll. Content stays visible without JavaScript, and reduced-motion preferences disable the decorative movement.
 
