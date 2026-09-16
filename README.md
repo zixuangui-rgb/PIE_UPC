@@ -2,7 +2,7 @@
 
 A small community website for **Paris International Exchange**, an international student community in Paris.
 
-The homepage keeps the original Paris hero and adds a scroll guide to three parallel gateways: Members, Events and Experiences. Each pairs an inset photograph with an overlapping text panel: sample member names and status, an event's date and location, or a story excerpt and author. Images and text links open the corresponding pages. The extension prioritizes desktop, with a stacked layout on smaller screens.
+The homepage keeps the original Paris hero and adds a scroll guide to three parallel gateways: Members, Events and Experiences. Each presents a compact text preview on the left and a small supporting photograph on the right: sample member names and status, an event's date and location, or a story excerpt and author. Images and text links open the corresponding pages. Gateways stack on smaller screens while retaining the side-by-side text and image layout.
 
 ## Content and interaction
 

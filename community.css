@@ -22,31 +22,31 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .demo-note { flex: none; max-width: 215px; margin: 0; padding-left: 14px; border-left: 2px solid #c9d1e5; color: var(--secondary); font-size: 11px; line-height: 1.7; }
 .gateway-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(24px, 2.6vw, 44px); }
 .gateway { min-width: 0; display: flex; flex-direction: column; }
-.gateway h3 { margin: 0; font: 400 clamp(34px, 3vw, 48px)/1.05 var(--serif); letter-spacing: -.015em; }
-.gateway-description { margin: 14px 0 24px; min-height: 42px; color: var(--secondary); font-size: 13px; line-height: 1.65; }
-.gateway-composition { flex: 1; }
-.gateway-photo { margin: 0 0 0 28px; aspect-ratio: 4 / 3; background: var(--members-paper); }
+.gateway h3 { margin: 0; font: 400 clamp(34px, 3vw, 44px)/1.05 var(--serif); letter-spacing: -.015em; }
+.gateway-description { margin: 14px 0 26px; color: var(--secondary); font-size: 13px; line-height: 1.65; }
+.gateway-composition { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) clamp(88px, 8vw, 120px); align-items: center; gap: 20px; min-height: 198px; padding: 8px 0 24px; }
+.gateway-photo { margin: 0; aspect-ratio: 4 / 5; background: var(--members-paper); }
 .gateway-image-link { display: block; width: 100%; height: 100%; overflow: hidden; }
 .gateway-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .gateway--events .gateway-photo { background: var(--events-paper); }
 .gateway--experiences .gateway-photo { background: var(--stories-paper); }
 .gateway-image-link:active img { opacity: .92; }
-.gateway-copy { position: relative; z-index: 1; width: calc(100% - 24px); min-height: 228px; margin-top: -34px; padding: 25px 22px 12px 0; background: var(--paper); }
-.gateway-kicker { margin: 0 0 20px; color: var(--blue); font-size: 10px; font-weight: 600; line-height: 1.7; letter-spacing: .075em; }
-.gateway-kicker > span { margin-inline: 7px; color: #909bb4; }
+.gateway-copy { min-width: 0; }
+.gateway-kicker { margin: 0 0 17px; color: var(--blue); font-size: 11px; font-weight: 500; line-height: 1.65; letter-spacing: .025em; }
+.gateway-kicker > span { margin-inline: 5px; color: #909bb4; }
 .gateway-people { padding: 0; margin: 0; list-style: none; }
-.gateway-people li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 0 0 14px; }
-.gateway-people li + li { padding-top: 14px; border-top: 1px solid var(--line); }
-.gateway-people strong { display: block; font: 400 25px/1.2 var(--serif); }
-.gateway-people div > span { display: block; margin-top: 5px; color: var(--secondary); font-size: 11px; line-height: 1.5; }
-.gateway-status { flex: none; padding: 4px 8px; background: var(--members-paper); color: var(--blue); font-size: 10px; line-height: 1.5; }
-.gateway-status--alumni { background: var(--events-paper); color: #70583e; }
-.gateway-feature-title { margin: 0 0 16px; font: 400 clamp(32px, 2.8vw, 44px)/1.05 var(--serif); letter-spacing: -.015em; }
+.gateway-people li + li { margin-top: 19px; }
+.gateway-people strong { display: block; font: 400 23px/1.2 var(--serif); }
+.gateway-person-meta { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; row-gap: 3px; margin: 6px 0 0; color: var(--secondary); font-size: 11px; line-height: 1.6; }
+.gateway-status { color: var(--blue); }
+.gateway-status::before { content: '·'; margin-right: 8px; color: var(--secondary); }
+.gateway-status--alumni { color: #70583e; }
+.gateway-feature-title { margin: 0 0 14px; font: 400 clamp(28px, 2.4vw, 34px)/1.08 var(--serif); letter-spacing: -.015em; }
 .gateway-detail { margin: 0; color: var(--secondary); font-size: 11px; line-height: 1.7; }
-.gateway-quote { margin: 0 0 17px; font: 400 clamp(24px, 2.05vw, 32px)/1.18 var(--serif); letter-spacing: -.01em; }
-.gateway-link { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 62px; margin-top: 12px; border-bottom: 1px solid var(--line); text-decoration: none; font-size: 13px; font-weight: 500; }
+.gateway-quote { margin: 0 0 14px; font: 400 22px/1.25 var(--serif); letter-spacing: -.01em; }
+.gateway-link { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 54px; margin-top: 0; border-top: 1px solid var(--line); text-decoration: none; font-size: 13px; font-weight: 500; }
 .gateway-link > span { font-size: 22px; font-weight: 400; color: var(--blue); }
-.gateway-link:hover { color: var(--blue); border-bottom-color: var(--blue); }
+.gateway-link:hover { color: var(--blue); border-top-color: var(--blue); }
 .site-footer { padding: 28px 0; display: flex; justify-content: space-between; gap: 20px; border-top: 1px solid var(--line); color: var(--secondary); font-size: 11px; line-height: 1.7; }
 .site-footer a { text-decoration: none; }
 .site-footer a:hover { color: var(--blue); }
@@ -120,10 +120,14 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 }
 
 @media (max-width: 1000px) and (min-width: 721px) {
-  .gateway-grid { gap: 20px; }
-  .gateway-photo { margin-left: 16px; }
-  .gateway-copy { width: calc(100% - 12px); padding-right: 8px; }
   .member-card, .story-card { padding: 22px; }
+}
+
+@media (max-width: 1100px) {
+  .gateway-grid { grid-template-columns: 1fr; gap: 44px; max-width: 580px; margin-inline: auto; }
+  .gateway-description { margin-bottom: 18px; }
+  .gateway-composition { grid-template-columns: minmax(0, 1fr) 120px; gap: 28px; min-height: 0; padding-block: 8px 24px; }
+  .gateway-quote { max-width: 27ch; }
 }
 
 @media (max-width: 720px) {
@@ -131,11 +135,7 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
   .discover { padding: 52px 0 60px; }
   .discover-heading { display: block; margin-bottom: 36px; }
   .discover-heading .demo-note { margin-top: 22px; max-width: none; }
-  .gateway-grid { grid-template-columns: 1fr; gap: 44px; }
-  .gateway-description { min-height: 0; margin-bottom: 22px; }
-  .gateway-copy { min-height: 0; padding-bottom: 4px; }
-  .gateway-feature-title { font-size: 36px; }
-  .gateway-quote { max-width: 28ch; font-size: 28px; }
+  .gateway-composition { grid-template-columns: minmax(0, 1fr) clamp(76px, 24vw, 110px); gap: 18px; }
   .inner-page .masthead { flex-wrap: wrap; gap: 12px; padding: 22px 0; }
   .site-nav { gap: 16px; flex-wrap: wrap; }
   .site-nav a { font-size: 11px; min-height: 34px; }
