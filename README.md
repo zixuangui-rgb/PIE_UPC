@@ -6,7 +6,7 @@ The homepage keeps the original Paris hero and adds a scroll guide to three para
 
 ## Content and interaction
 
-- Members: Sparlay Khan's CIRP project team profile uses her supplied photograph, Pakistan, joined year 2025, and interests in environmental studies, exploring nature, and travelling. Six additional fictional profiles are marked Demo, with AI-generated portraits and Active/Alumni example status. Example emails use `example.com` and are display-only placeholders.
+- Members: Sparlay Khan's community member profile uses her supplied photograph, Pakistan, joined year 2025, interests in environmental studies, exploring nature, and travelling, and a clickable email contact. Six additional fictional profiles are marked Demo, with AI-generated portraits and Active/Alumni example status. Example emails use `example.com` and are display-only placeholders.
 - Events: three fictional activities with dates, locations and landscape scenes. The date sits in a solid badge over each photo, paired with the activity description; phones place the media above the text.
 - Experiences: three fictional stories presented as wide article rows with photos alongside grouped titles, bylines and summaries, plus native expand/collapse controls. Phones show the photo as the top of the same story card.
 - Each activity and story has its own image; no image is shared between the Events and Experiences pages.
@@ -50,7 +50,7 @@ Use relative URLs for local assets so the site works under the repository's `/PI
 - The association name was checked against [PIE's Instagram profile](https://www.instagram.com/pie_upc/) on 15 September 2026.
 - Typography uses Instrument Serif and DM Sans through Google Fonts, with fallback fonts.
 - The Paris artwork was generated for this homepage. It is not a documentary photograph of a PIE event.
-- Sparlay Khan's photograph and profile information were supplied by the project team. Her contact details, languages and PIE Active/Alumni status have not been supplied and are not inferred.
+- Sparlay Khan's photograph, profile information and email contact were supplied by the project team. Her languages and PIE Active/Alumni status have not been supplied and are not inferred.
 - The six Demo portraits and subpage scene images are AI-generated examples, as labeled on each page. They do not depict actual PIE members or events. Generation prompts and file details are in [member image prompts](docs/member-image-prompts.md) and [scene image prompts](docs/scene-image-prompts.md).
 
 This repository is the working source for the website.
