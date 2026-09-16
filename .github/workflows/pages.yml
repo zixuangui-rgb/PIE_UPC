@@ -33,7 +33,7 @@ jobs:
         run: |
           mkdir -p _site/assets
           cp index.html members.html events.html experiences.html style.css community.css main.js .nojekyll _site/
-          cp assets/*.webp _site/assets/
+          cp assets/paris-editorial.webp _site/assets/
 
       - name: Upload site
         uses: actions/upload-pages-artifact@v4

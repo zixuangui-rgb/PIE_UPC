@@ -2,7 +2,7 @@
 
 A small community website for **Paris International Exchange**, an international student community in Paris.
 
-The homepage keeps the original Paris hero and adds a scroll guide to three parallel gateways: Members, Events and Experiences. Each presents a compact text preview on the left and a small supporting photograph on the right: sample member names and status, an event's date and location, or a story excerpt and author. Images and text links open the corresponding pages. Gateways stack on smaller screens while retaining the side-by-side text and image layout.
+The homepage keeps the original Paris hero and adds a scroll guide to three parallel gateways: Members, Events and Experiences. Each opens a separate page. The extension prioritizes desktop, with a stacked layout on smaller screens.
 
 ## Content and interaction
 
@@ -30,8 +30,6 @@ Open `http://localhost:8000/`.
 | `community.css` | Community sections, destination pages and interaction styles |
 | `main.js` | Progressive scroll reveal for the homepage gateways |
 | `assets/paris-editorial.webp` | Paris hero artwork |
-| `assets/members-community.webp`, `assets/events-coffee.webp`, `assets/experiences-paris.webp` | Optimized illustrative photos for the homepage gateways |
-| `docs/image-prompts.md` | Gateway image prompts and provenance |
 | `.github/workflows/pages.yml` | Automatic GitHub Pages deployment |
 
 ## Deployment
@@ -45,6 +43,5 @@ Use relative URLs for local assets so the site works under the repository's `/PI
 - The association name was checked against [PIE's Instagram profile](https://www.instagram.com/pie_upc/) on 15 September 2026.
 - Typography uses Instrument Serif and DM Sans through Google Fonts, with fallback fonts.
 - The Paris artwork was generated for this homepage. It is not a documentary photograph of a PIE event.
-- The three gateway images were generated with the built-in image tool and are visibly labeled as AI-generated imagery. They illustrate student life, not real PIE members or activities. Full prompts and source details are recorded in [docs/image-prompts.md](docs/image-prompts.md).
 
 This repository is the working source for the website.
