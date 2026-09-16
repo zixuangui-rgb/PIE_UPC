@@ -69,6 +69,8 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .member-card { display: flex; flex-direction: column; min-width: 0; padding: 28px; background: #fff; border: 1px solid var(--line); }
 .member-card-header { display: flex; align-items: center; gap: 16px; }
 .member-portrait { flex: none; display: block; width: 80px; height: 80px; border-radius: 50%; object-fit: cover; background: var(--members-paper); }
+.member-portrait--sparlay { overflow: hidden; }
+.member-portrait--sparlay img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(2); transform-origin: 50% 48%; }
 .member-identity { min-width: 0; }
 .member-status { display: inline-flex; align-items: center; padding: 4px 9px; border-radius: 20px; font-size: 10px; font-weight: 500; line-height: 1.5; }
 .member-status--active { background: var(--members-paper); color: var(--blue); }
