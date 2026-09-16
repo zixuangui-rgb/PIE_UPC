@@ -6,7 +6,7 @@ The homepage keeps the original Paris hero and adds a scroll guide to three para
 
 ## Content and interaction
 
-- Members: six fictional profiles with roles, languages and interests.
+- Members: six fictional profiles with Active/Alumni status, roles, languages, interests and clearly labeled example email addresses. Example emails use `example.com` and are display-only placeholders.
 - Events: three fictional activities with dates and locations.
 - Experiences: three fictional stories with native expand/collapse controls.
 - All invented content is visibly labeled as demo content; there are no real contact or registration actions.

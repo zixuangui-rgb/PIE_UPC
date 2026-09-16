@@ -66,12 +66,21 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .page-lead { max-width: 560px; margin: 24px 0 22px; color: var(--secondary); font-size: 16px; line-height: 1.75; }
 .page-intro .demo-note { max-width: 540px; font-size: 12px; }
 .member-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; padding: 8px 0 88px; }
-.member-card { padding: 28px; background: #fff; border: 1px solid var(--line); }
-.member-monogram { display: grid; place-items: center; width: 72px; height: 72px; margin-bottom: 26px; border-radius: 50%; background: #e1e8f7; color: var(--blue); font: 400 33px var(--serif); }
+.member-card { display: flex; flex-direction: column; min-width: 0; padding: 28px; background: #fff; border: 1px solid var(--line); }
+.member-card-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 26px; }
+.member-monogram { flex: none; display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: #e1e8f7; color: var(--blue); font: 400 33px var(--serif); }
+.member-status { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 20px; font-size: 11px; font-weight: 500; line-height: 1.5; }
+.member-status--active { background: var(--members-paper); color: var(--blue); }
+.member-status--alumni { background: var(--events-paper); color: #70583e; }
 .member-card:nth-child(3n + 2) .member-monogram { background: var(--events-paper); color: #70583e; }
 .member-card:nth-child(3n + 3) .member-monogram { background: var(--stories-paper); color: #365d48; }
 .member-role { margin: 0 0 10px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--blue); }
 .member-card h2 { margin: 0; font: 400 34px/1.1 var(--serif); }
+.member-card .tag-list { margin-bottom: 24px; }
+.member-contact { margin: auto 0 0; padding-top: 18px; border-top: 1px solid var(--line); }
+.member-contact dt { display: flex; align-items: baseline; gap: 8px; color: var(--secondary); font-size: 11px; font-weight: 500; }
+.member-contact dt span { font-size: 10px; font-weight: 400; }
+.member-contact dd { margin: 7px 0 0; color: var(--ink); font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
 .card-summary { margin: 16px 0 22px; color: var(--secondary); font-size: 13px; line-height: 1.8; }
 .tag-list { display: flex; flex-wrap: wrap; gap: 7px; padding: 0; margin: 0; list-style: none; }
 .tag-list li { border: 1px solid #e0e5ee; padding: 5px 8px; color: var(--secondary); font-size: 10px; line-height: 1.5; }
