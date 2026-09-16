@@ -166,8 +166,9 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
   .member-card-header { gap: 14px; }
   .member-card h2 { font-size: 27px; }
   .event-row { grid-template-columns: minmax(0, 36%) minmax(0, 1fr); gap: 24px; padding: 28px 0; }
-  .event-date { bottom: 12px; left: 12px; min-width: 58px; padding: 9px 11px; }
-  .event-date span { font-size: 34px; }
+  .event-date { bottom: 8px; left: 8px; min-width: 44px; padding: 6px 8px; }
+  .event-date span { font-size: 26px; }
+  .event-date small { margin-top: 3px; font-size: 9px; }
   .story-overview { gap: 24px; }
   .site-footer { flex-wrap: wrap; font-size: 10px; }
 }
