@@ -185,6 +185,22 @@
     }
   }
 
+  const SKELETON_CARD =
+    '<article class="finder-card finder-card--skeleton" aria-hidden="true">' +
+    '<div class="finder-photo"></div>' +
+    '<div class="finder-body"><span class="sk sk-title"></span><span class="sk"></span><span class="sk sk-short"></span></div>' +
+    '</article>';
+
+  function showSkeletons() {
+    setMode(null);
+    if (summaryEl) summaryEl.hidden = true;
+    noteEl.textContent = '';
+    grid.innerHTML = SKELETON_CARD + SKELETON_CARD + SKELETON_CARD;
+    results.removeAttribute('dir');
+    results.removeAttribute('lang');
+    results.hidden = false;
+  }
+
   function renderPreview() {
     const tokens = tokenize(input.value || '');
     const langSet = languagesFrom(tokens);
@@ -255,11 +271,17 @@
   async function run() {
     if (busy) return;
     busy = true;
+    const started = Date.now();
     setLoading(true);
+    showSkeletons();
     let data = null;
     try {
       data = await aiSuggest(input.value.trim());
     } catch (err) { data = null; }
+    // Keep the loading state perceptible even when the answer (or a failure)
+    // arrives instantly, so the UI never flashes or feels jumpy.
+    const elapsed = Date.now() - started;
+    if (elapsed < 700) await new Promise((resolve) => setTimeout(resolve, 700 - elapsed));
     setLoading(false);
     busy = false;
     if (!data || !renderAi(data)) renderPreview();

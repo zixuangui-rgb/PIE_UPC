@@ -19,7 +19,10 @@ if (!KEY) {
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type'
+  'Access-Control-Allow-Headers': 'Content-Type',
+  // Chrome Private Network Access: allow public (https) pages to call this
+  // loopback endpoint. Without this header the browser blocks the request.
+  'Access-Control-Allow-Private-Network': 'true'
 };
 
 // Light per-IP throttle for local use.
