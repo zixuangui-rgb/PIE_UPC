@@ -23,6 +23,7 @@ MEMBERS — id | name | role, country | languages | interests | real/demo
 - zixuan-gui | Zixuan Gui | Volunteer, China | ZH/EN | sports, ski, coding, computer science | real
 - tamara-matijevic | Tamara Matijević | Community member, Serbia | EN/FR/SR | neuroscience, molecular biology | real
 - alessio-saturnino | Alessio SATURNINO | Community member, Italy | IT/EN/FR/ES | running, gym, basketball, volleyball, techno, poetry, nature | real
+- amir-cheraghali | Amir M. Cheraghali | Community member | — | hiking, football, piano | real
 - lina-moreau | Lina Moreau | Welcome buddy, France | EN/FR | photography, city walks | demo
 - mateo-silva | Mateo Silva | Event volunteer, Brazil | EN/PT | music, meetups, cafés | demo
 - aya-tanaka | Aya Tanaka | Community member, Japan | EN/JA | art, galleries, coffee | demo
@@ -94,7 +95,7 @@ OUTPUT SCHEMA
 }`;
 
 export const CATALOG_IDS = {
-  member: new Set(['sparlay-khan', 'zixuan-gui', 'tamara-matijevic', 'alessio-saturnino', 'lina-moreau', 'mateo-silva', 'aya-tanaka', 'salma-nouri', 'elias-lind', 'priya-nair', 'jonas-weber', 'giulia-rossi', 'camila-torres', 'aminata-diop', 'chen-wei', 'louis-bernard', 'arjun-mehta', 'yuting-lin', 'youssef-el-amrani', 'beatriz-costa', 'ines-laurent', 'kavya-rao', 'hamza-ahmed', 'imane-benali', 'thomas-petit', 'hao-zhang']),
+  member: new Set(['sparlay-khan', 'zixuan-gui', 'tamara-matijevic', 'alessio-saturnino', 'amir-cheraghali', 'lina-moreau', 'mateo-silva', 'aya-tanaka', 'salma-nouri', 'elias-lind', 'priya-nair', 'jonas-weber', 'giulia-rossi', 'camila-torres', 'aminata-diop', 'chen-wei', 'louis-bernard', 'arjun-mehta', 'yuting-lin', 'youssef-el-amrani', 'beatriz-costa', 'ines-laurent', 'kavya-rao', 'hamza-ahmed', 'imane-benali', 'thomas-petit', 'hao-zhang']),
   event: new Set(['coffee-first-hellos', 'sunday-seine-walk', 'language-cafe', 'board-game-evening', 'neighbourhood-sketch-walk', 'shared-student-dinner', 'quiet-study-and-tea', 'sunday-photo-walk', 'language-cafe-everyday', 'park-run-and-walk', 'books-and-small-item-swap', 'november-community-check-in']),
   story: new Set(['finding-my-first-familiar-faces', 'paris-one-small-routine', 'the-afternoon-i-said-yes', 'a-small-plan-for-a-shared-kitchen', 'joining-a-game-without-knowing-the-rules', 'leaving-paris-keeping-in-touch', 'putting-the-camera-down', 'asking-people-to-slow-down', 'a-study-session-one-small-question', 'making-room-for-a-quiet-weekend', 'a-handover-that-fit-on-one-page', 'making-a-plan-people-could-actually-join'])
 };

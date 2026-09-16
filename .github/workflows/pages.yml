@@ -33,7 +33,7 @@ jobs:
         run: |
           mkdir -p _site/assets
           cp index.html members.html events.html experiences.html style.css community.css main.js .nojekyll _site/
-          cp assets/*.webp assets/*.jpeg _site/assets/
+          cp assets/*.webp assets/*.jpeg assets/*.png _site/assets/
           python3 scripts/version_assets.py _site
 
       - name: Upload site
