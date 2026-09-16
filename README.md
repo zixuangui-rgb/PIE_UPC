@@ -6,7 +6,7 @@ The homepage keeps the original Paris hero and adds a scroll guide to three para
 
 ## Content and interaction
 
-- Members: Sparlay Khan's profile uses her supplied photograph, Manager role, Pakistan, Active status, joined year 2025, interests in environmental studies, exploring nature, and travelling, and a clickable email contact. Six additional fictional profiles are marked Demo, with AI-generated portraits and Active/Alumni example status. Example emails use `example.com` and are display-only placeholders.
+- Members: Sparlay Khan and Zixuan Gui have real profiles with supplied photographs and clickable email contacts. Sparlay is shown as Manager · Pakistan, Active, with joined year 2025 and interests in environmental studies, exploring nature, and travelling. Zixuan is shown as Volunteer · China, Active: a sports enthusiast and ski instructor with a computer science background and Chinese/English, Ski, and Coding tags. Six additional fictional profiles are marked Demo, with AI-generated portraits and Active/Alumni example status. Example emails use `example.com` and are display-only placeholders.
 - Events: three fictional activities with dates, locations and landscape scenes. The date sits in a solid badge over each photo, paired with the activity description; phones place the media above the text.
 - Experiences: three fictional stories presented as wide article rows with photos alongside grouped titles, bylines and summaries, plus native expand/collapse controls. Phones show the photo as the top of the same story card.
 - Each activity and story has its own image; no image is shared between the Events and Experiences pages.
@@ -32,6 +32,7 @@ Open `http://localhost:8000/`.
 | `main.js` | Progressive scroll reveal for the homepage gateways |
 | `assets/paris-editorial.webp` | Paris hero artwork |
 | `assets/member-*.webp` | Six fictional member portraits |
+| `assets/member-*.jpeg` | Supplied photographs for real member profiles |
 | `assets/event-*.webp`, `assets/story-*.webp` | Supporting scenes for activities and stories |
 | `docs/member-image-prompts.md`, `docs/scene-image-prompts.md` | Image prompts, saved paths and generation provenance |
 | `scripts/version_assets.py` | Adds content-based CSS/JS version URLs to staged pages |
@@ -51,6 +52,7 @@ Use relative URLs for local assets so the site works under the repository's `/PI
 - Typography uses Instrument Serif and DM Sans through Google Fonts, with fallback fonts.
 - The Paris artwork was generated for this homepage. It is not a documentary photograph of a PIE event.
 - Sparlay Khan's photograph, profile information and email contact were supplied by the project team. Her Manager role and Active status use the wording requested by the project team. Her languages have not been supplied and are not inferred.
+- Zixuan Gui's photograph, Volunteer role, Active status, nationality, interests, languages, computer science background and email contact were supplied by him. No joined year has been added for his profile.
 - The six Demo portraits and subpage scene images are AI-generated examples, as labeled on each page. They do not depict actual PIE members or events. Generation prompts and file details are in [member image prompts](docs/member-image-prompts.md) and [scene image prompts](docs/scene-image-prompts.md).
 
 This repository is the working source for the website.
