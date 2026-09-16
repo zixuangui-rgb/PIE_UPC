@@ -76,15 +76,17 @@
 
   const LANG_ALIASES = { '中文': ['chinese', 'mandarin'], '汉语': ['chinese', 'mandarin'], '普通话': ['mandarin'], 'français': ['french'], 'francais': ['french'], '日本語': ['japanese'], 'nihongo': ['japanese'], 'español': ['spanish'], 'espanol': ['spanish'], 'italiano': ['italian'] };
   const ZH_TERMS = { '法语': 'french', '英文': 'english', '英语': 'english', '中文': 'chinese mandarin', '汉语': 'chinese mandarin', '普通话': 'mandarin', '日语': 'japanese', '西班牙语': 'spanish', '意大利语': 'italian', '摄影': 'photography', '照片': 'photo', '拍照': 'photography', '跑步': 'running', '跑': 'run', '慢跑': 'running', '徒步': 'hiking', '爬山': 'hiking', '桌游': 'board games', '游戏': 'games', '咖啡': 'coffee cafe', '咖啡馆': 'cafe', '艺术': 'art', '画廊': 'gallery', '画画': 'sketching', '写生': 'sketch walk', '读书': 'books reading', '书': 'books', '电影': 'film cinema', '做饭': 'cooking', '烹饪': 'cooking', '音乐': 'music', '健身房': 'gym', '健身': 'gym', '篮球': 'basketball', '排球': 'volleyball', '滑雪': 'ski skiing', '编程': 'coding programming', '代码': 'coding', '计算机': 'computer science', '生物': 'biology', '科学': 'science', '安静': 'quiet', '周末': 'weekend', '累': 'tired', '害羞': 'shy', '内向': 'shy', '朋友': 'friends meeting people', '认识': 'meeting people', '聊天': 'conversation', '口语': 'practice conversation', '练习': 'practice', '学习': 'study', '考试': 'exams', '图书馆': 'library', '新生': 'new', '新来': 'new' };
+  const AR_TERMS = { 'التصوير': 'photography photo', 'فوتوغرافيا': 'photography', 'كاميرا': 'camera', 'جديد': 'new', 'جديدة': 'new', 'الفرنسية': 'french', 'فرنسي': 'french', 'الإنجليزية': 'english', 'إنجليزي': 'english', 'العربية': 'arabic', 'لغة': 'language', 'اللغات': 'languages', 'قهوة': 'coffee cafe', 'مقهى': 'cafe', 'أصدقاء': 'friends meeting people', 'صديق': 'friends', 'التعارف': 'meeting people', 'كرة السلة': 'basketball', 'الجري': 'running run', 'أركض': 'running', 'رياضة': 'sport', 'موسيقى': 'music', 'طبخ': 'cooking', 'الطهي': 'cooking', 'طعام': 'food', 'كتب': 'books', 'قراءة': 'books reading', 'أفلام': 'film cinema', 'سينما': 'cinema', 'فن': 'art', 'رسم': 'sketch sketching', 'دراسة': 'study', 'الدراسة': 'study', 'امتحانات': 'exams', 'مكتبة': 'library', 'هادئ': 'quiet', 'الهدوء': 'quiet', 'متعب': 'tired', 'نهاية الأسبوع': 'weekend', 'خجول': 'shy', 'الخجل': 'shy', 'ألعاب اللوح': 'board games', 'ألعاب': 'games', 'مشي': 'walk walking', 'نهر': 'river seine', 'طبيعة': 'nature', 'سفر': 'travel travelling', 'بيئة': 'environment', 'شعر': 'poems poetry', 'حفلات': 'party' };
 
   const ACCENTS = { 'á':'a','à':'a','â':'a','é':'e','è':'e','ê':'e','ë':'e','í':'i','ì':'i','î':'i','ó':'o','ò':'o','ô':'o','ö':'o','ú':'u','ù':'u','û':'u','ü':'u','ç':'c','ñ':'n' };
   const stripAccents = (value) => value.replace(/[à-ÿ]/g, (ch) => ACCENTS[ch] || ch);
-  const expandChinese = (value) => value.replace(/[\u4e00-\u9fff]+/g, (run) => {
+  const expandTerms = (run, map) => {
     let out = '';
-    for (const term of Object.keys(ZH_TERMS)) if (run.includes(term)) out += ' ' + ZH_TERMS[term];
-    return out || run;
-  });
-  const tokenize = (value) => (' ' + stripAccents(expandChinese(value.toLowerCase())).replace(/[^a-z0-9\u4e00-\u9fff]+/gi, ' ').replace(/\s+/g, ' ') + ' ');
+    for (const term of Object.keys(map)) if (run.includes(term)) out += ' ' + map[term];
+    return out;
+  };
+  const expandNonLatin = (value) => value.replace(/([\u4e00-\u9fff]+)|([\u0600-\u06FF]+)/g, (run) => expandTerms(run, ZH_TERMS) + expandTerms(run, AR_TERMS));
+  const tokenize = (value) => (' ' + stripAccents(expandNonLatin(value.toLowerCase())).replace(/[^a-z0-9]+/gi, ' ').replace(/\s+/g, ' ') + ' ');
   const hasWord = (tokens, phrase) => tokens.includes(' ' + phrase + ' ') || tokens.includes(' ' + phrase + 's ');
 
   function pick(list, interestTokens, langSet) {

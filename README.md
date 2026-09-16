@@ -12,7 +12,7 @@ The homepage keeps the original Paris hero, adds a **Find your PIE** preview and
 - Each activity and story has its own image; no image is shared between the Events and Experiences pages.
 - All invented content is visibly labeled as demo content. The four supplied real profiles have working email links; demo addresses remain display-only, and no example event has a real registration action.
 - The three homepage gateways reveal on scroll. Content stays visible without JavaScript, and reduced-motion preferences disable the decorative movement.
-- Find your PIE (preview): one box under the homepage hero. Visitors describe their background and goals in a single sentence and receive one member, event and story suggestion from the demo directory. Interests and languages are inferred from the sentence itself; interim matching runs in the browser with keyword overlap (Chinese input is mapped to matching terms), and entries keep their Demo/Example labels and link to page anchors. An AI-backed match is planned. Nothing is sent anywhere and no input is stored.
+- Find your PIE (preview): one box under the homepage hero. Visitors describe their background and goals in a single sentence and receive one member, event and story suggestion from the demo directory. Interests and languages are inferred from the sentence itself; interim matching runs in the browser with keyword overlap (Chinese and Arabic input is mapped to matching terms), and entries keep their Demo/Example labels and link to page anchors. The three example prompts are in Arabic, Chinese and English. An AI-backed match is planned. Nothing is sent anywhere and no input is stored.
 
 ## Development
 
