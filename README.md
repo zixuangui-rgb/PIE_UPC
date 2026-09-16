@@ -6,11 +6,11 @@ The homepage keeps the original Paris hero and adds a scroll guide to three para
 
 ## Content and interaction
 
-- Members: Sparlay Khan and Zixuan Gui have real profiles with supplied photographs and clickable email contacts. Sparlay is shown as Manager · Pakistan, Active, with joined year 2025 and interests in environmental studies, exploring nature, and travelling. Zixuan is shown as Volunteer · China, Active: a sports enthusiast and ski instructor with a computer science background and Chinese/English, Ski, and Coding tags. Six additional fictional profiles are marked Demo, with AI-generated portraits and Active/Alumni example status. Example emails use `example.com` and are display-only placeholders.
-- Events: three fictional activities with dates, locations and landscape scenes. The date sits in a solid badge over each photo, paired with the activity description; phones place the media above the text.
-- Experiences: three fictional stories presented as wide article rows with photos alongside grouped titles, bylines and summaries, plus native expand/collapse controls. Phones show the photo as the top of the same story card.
+- Members: twelve profiles, including Sparlay Khan and Zixuan Gui with supplied photographs and clickable email contacts. Sparlay is shown as Manager · Pakistan, Active, with joined year 2025 and interests in environmental studies, exploring nature, and travelling. Zixuan is shown as Volunteer · China, Active: a sports enthusiast and ski instructor with a computer science background and Chinese/English, Ski, and Coding tags. Ten additional fictional profiles are marked Demo, with AI-generated portraits and Active/Alumni example status. Example emails use `example.com` and are display-only placeholders.
+- Events: six fictional activities in September and October 2026, covering coffee, a riverside walk, language exchange, board games, a sketch walk and a shared student dinner. Each has its own image, date, time, setting and practical participation details. The date sits in a small frosted-glass badge over each photo; phones place the media above the text.
+- Experiences: six fictional first-person stories about settling in, daily routines, volunteering, shared kitchens, joining a game and staying connected after leaving Paris. Each author has a corresponding fictional member profile. Wide article rows pair photos with titles, bylines and summaries, plus native expand/collapse controls. Phones show the photo as the top of the same story card.
 - Each activity and story has its own image; no image is shared between the Events and Experiences pages.
-- All invented content is visibly labeled as demo content; there are no real contact or registration actions.
+- All invented content is visibly labeled as demo content. Only the two supplied real profiles have working email links; demo addresses remain display-only, and no example event has a real registration action.
 - The three homepage gateways reveal on scroll. Content stays visible without JavaScript, and reduced-motion preferences disable the decorative movement.
 
 ## Development
@@ -31,10 +31,12 @@ Open `http://localhost:8000/`.
 | `community.css` | Community sections, destination pages and interaction styles |
 | `main.js` | Progressive scroll reveal for the homepage gateways |
 | `assets/paris-editorial.webp` | Paris hero artwork |
-| `assets/member-*.webp` | Six fictional member portraits |
+| `assets/member-*.webp` | Ten fictional member portraits |
 | `assets/member-*.jpeg` | Supplied photographs for real member profiles |
 | `assets/event-*.webp`, `assets/story-*.webp` | Supporting scenes for activities and stories |
 | `docs/member-image-prompts.md`, `docs/scene-image-prompts.md` | Image prompts, saved paths and generation provenance |
+| `docs/expanded-*-image-prompts.md` | Prompts and provenance for the expanded demo content |
+| `docs/demo-content-guidelines.md` | Plausibility and consistency rules for demo profiles, events and stories |
 | `scripts/version_assets.py` | Adds content-based CSS/JS version URLs to staged pages |
 | `.github/workflows/pages.yml` | Automatic GitHub Pages deployment |
 
@@ -53,6 +55,6 @@ Use relative URLs for local assets so the site works under the repository's `/PI
 - The Paris artwork was generated for this homepage. It is not a documentary photograph of a PIE event.
 - Sparlay Khan's photograph, profile information and email contact were supplied by the project team. Her Manager role and Active status use the wording requested by the project team. Her languages have not been supplied and are not inferred.
 - Zixuan Gui's photograph, Volunteer role, Active status, nationality, interests, languages, computer science background and email contact were supplied by him. No joined year has been added for his profile.
-- The six Demo portraits and subpage scene images are AI-generated examples, as labeled on each page. They do not depict actual PIE members or events. Generation prompts and file details are in [member image prompts](docs/member-image-prompts.md) and [scene image prompts](docs/scene-image-prompts.md).
+- The ten Demo portraits and subpage scene images are AI-generated examples, as labeled on each page. They do not depict actual PIE members or events. Original generation records are in [member image prompts](docs/member-image-prompts.md) and [scene image prompts](docs/scene-image-prompts.md); additions are documented in [expanded member images](docs/expanded-member-image-prompts.md), [expanded event images](docs/expanded-event-image-prompts.md) and [expanded story images](docs/expanded-story-image-prompts.md).
 
 This repository is the working source for the website.
