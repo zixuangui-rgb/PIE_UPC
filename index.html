@@ -37,6 +37,29 @@
           </a>
         </section>
 
+        <section class="finder" id="finder" aria-labelledby="finder-title">
+          <header class="finder-heading">
+            <p class="section-kicker">FIND YOUR PIE</p>
+            <h2 id="finder-title">Tell us about you.</h2>
+            <p class="demo-note">Preview — suggestions come from the demo directory. Personalised AI matching is on its way.</p>
+          </header>
+          <form class="finder-composer" id="finder-form">
+            <textarea id="finder-input" name="q" rows="1" maxlength="600" autocomplete="off" aria-label="Describe your background and what you are looking for" placeholder="I'm new in Paris, studying biology. I love photography and quiet cafés…"></textarea>
+            <button type="submit" class="finder-submit" id="finder-submit">Find my PIE <span aria-hidden="true">→</span></button>
+          </form>
+          <p class="finder-privacy">Your input is only used to build these suggestions. Nothing is stored.</p>
+          <div class="finder-examples">
+            <span>Try:</span>
+            <button type="button" class="finder-example">New in Paris, love photography</button>
+            <button type="button" class="finder-example">想练法语口语，有点害羞</button>
+            <button type="button" class="finder-example">A quiet weekend and running partners</button>
+          </div>
+          <div class="finder-results" id="finder-results" hidden aria-live="polite">
+            <p class="finder-results-note" id="finder-results-note"></p>
+            <div class="finder-grid" id="finder-grid"></div>
+          </div>
+        </section>
+
         <section class="discover" id="discover" aria-labelledby="discover-title">
           <header class="discover-heading">
             <div>

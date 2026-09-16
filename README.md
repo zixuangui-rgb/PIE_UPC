@@ -2,7 +2,7 @@
 
 A small community website for **Paris International Exchange**, an international student community in Paris.
 
-The homepage keeps the original Paris hero and adds a scroll guide to three parallel gateways: Members, Events and Experiences. Each opens a separate page. The extension prioritizes desktop, with a stacked layout on smaller screens.
+The homepage keeps the original Paris hero, adds a **Find your PIE** preview and a scroll guide to three parallel gateways: Members, Events and Experiences. Each opens a separate page. The extension prioritizes desktop, with a stacked layout on smaller screens.
 
 ## Content and interaction
 
@@ -12,6 +12,7 @@ The homepage keeps the original Paris hero and adds a scroll guide to three para
 - Each activity and story has its own image; no image is shared between the Events and Experiences pages.
 - All invented content is visibly labeled as demo content. The four supplied real profiles have working email links; demo addresses remain display-only, and no example event has a real registration action.
 - The three homepage gateways reveal on scroll. Content stays visible without JavaScript, and reduced-motion preferences disable the decorative movement.
+- Find your PIE (preview): one box under the homepage hero. Visitors describe their background and goals in a single sentence and receive one member, event and story suggestion from the demo directory. Interests and languages are inferred from the sentence itself; interim matching runs in the browser with keyword overlap (Chinese input is mapped to matching terms), and entries keep their Demo/Example labels and link to page anchors. An AI-backed match is planned. Nothing is sent anywhere and no input is stored.
 
 ## Development
 
@@ -29,7 +30,7 @@ Open `http://localhost:8000/`.
 | `members.html`, `events.html`, `experiences.html` | Community destination pages |
 | `style.css` | Original hero typography and responsive layout |
 | `community.css` | Community sections, destination pages and interaction styles |
-| `main.js` | Progressive scroll reveal for the homepage gateways |
+| `main.js` | Progressive scroll reveal for the homepage gateways and the Find your PIE preview matching |
 | `assets/paris-editorial.webp` | Paris hero artwork |
 | `assets/member-*.webp` | Twenty-two fictional member portraits |
 | `assets/member-*.jpeg` | Supplied photographs for real member profiles |

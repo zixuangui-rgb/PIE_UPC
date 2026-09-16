@@ -188,3 +188,55 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
   .story-photo { grid-row: 1; aspect-ratio: 16 / 10; }
   .story-details { margin: 24px 22px 22px; }
 }
+
+/* Find your PIE preview. */
+.finder { padding: 78px 0 88px; border-top: 1px solid var(--line); scroll-margin-top: 28px; }
+.finder-heading { max-width: 760px; margin-bottom: 30px; }
+.finder h2 { margin: 0 0 18px; font: 400 clamp(38px, 3.7vw, 64px)/1.08 var(--serif); letter-spacing: -.02em; }
+.finder-heading .demo-note { max-width: 540px; font-size: 12px; }
+.finder-composer { display: flex; align-items: stretch; gap: 12px; padding: 10px 10px 10px 20px; background: #fff; border: 1px solid var(--line); border-radius: 14px; transition: border-color .2s ease; }
+.finder-composer:focus-within { border-color: var(--blue); }
+.finder-composer textarea { flex: 1; min-width: 0; min-height: 48px; max-height: 138px; padding: 13px 0; border: 0; background: transparent; resize: none; overflow-y: auto; color: var(--ink); font: 400 15px/1.6 var(--sans); }
+.finder-composer textarea:focus-visible { outline: none; }
+.finder-composer textarea::placeholder { color: #9aa3b8; }
+.finder-submit { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 12px 24px; background: var(--blue); border: 0; border-radius: 10px; color: #fff; font: 600 14px var(--sans); cursor: pointer; }
+.finder-submit:hover { background: #1c2d99; }
+.finder-submit > span { font-size: 17px; }
+.finder-privacy { margin: 12px 2px 0; color: var(--secondary); font-size: 11px; line-height: 1.6; }
+.finder-examples { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 24px; }
+.finder-examples > span { color: var(--secondary); font-size: 12px; }
+.finder-example { min-height: 34px; padding: 7px 15px; background: var(--paper); border: 1px solid var(--line); border-radius: 18px; color: var(--secondary); font: 400 12.5px/1.4 var(--sans); cursor: pointer; transition: color .2s ease, border-color .2s ease; }
+.finder-example:hover { color: var(--blue); border-color: var(--blue); }
+.finder-results { margin-top: 42px; }
+.finder-results[hidden] { display: none; }
+.finder-results-note { margin: 0 0 20px; color: var(--secondary); font-size: 12px; line-height: 1.7; }
+.finder-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.finder-card { min-width: 0; display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); }
+.finder-photo { margin: 0; aspect-ratio: 4 / 3; overflow: hidden; background: var(--members-paper); }
+.finder-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.finder-body { display: flex; flex-direction: column; flex: 1; padding: 20px 22px 22px; }
+.finder-type { margin: 0 0 12px; color: var(--blue); font-size: 10px; font-weight: 600; letter-spacing: .09em; }
+.finder-card h3 { margin: 0 0 10px; font: 400 26px/1.15 var(--serif); letter-spacing: -.01em; }
+.finder-demo { display: inline-block; margin-left: 8px; padding: 3px 7px; border: 1px solid var(--line); border-radius: 20px; color: var(--secondary); font: 500 10px/1.4 var(--sans); letter-spacing: 0; vertical-align: 6px; }
+.finder-reason { margin: 0; color: var(--secondary); font-size: 13px; line-height: 1.7; }
+.finder-link { display: inline-flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 18px; color: var(--blue); text-decoration: none; font-size: 13px; font-weight: 500; }
+.finder-link > span { font-size: 18px; }
+.finder-link:hover { text-decoration: underline; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .finder-submit > span { transition: transform .2s ease; }
+  .finder-submit:hover > span { transform: translateX(3px); }
+}
+
+@media (max-width: 1000px) and (min-width: 721px) {
+  .finder-grid { gap: 20px; }
+}
+
+@media (max-width: 720px) {
+  .finder { padding: 52px 0 60px; }
+  .finder-composer { flex-wrap: wrap; padding: 10px; }
+  .finder-composer textarea { flex-basis: 100%; min-height: 52px; }
+  .finder-submit { flex: 1; }
+  .finder-grid { grid-template-columns: minmax(0, 1fr); }
+  .finder-card h3 { font-size: 24px; }
+}
