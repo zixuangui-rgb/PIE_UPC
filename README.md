@@ -6,9 +6,9 @@ The homepage keeps the original Paris hero and adds a scroll guide to three para
 
 ## Content and interaction
 
-- Members: six fictional profiles with Active/Alumni status, roles, languages, interests and clearly labeled example email addresses. Example emails use `example.com` and are display-only placeholders.
-- Events: three fictional activities with dates and locations.
-- Experiences: three fictional stories with native expand/collapse controls.
+- Members: six fictional profiles with small AI-generated portraits grouped with names, roles and Active/Alumni status. Languages, interests and clearly labeled example email addresses remain below. Example emails use `example.com` and are display-only placeholders.
+- Events: three fictional activities with dates, locations and small scene images. On phones, the date and image share a row above the full-width description.
+- Experiences: three fictional stories presented as wide article rows with supporting photos and native expand/collapse controls.
 - All invented content is visibly labeled as demo content; there are no real contact or registration actions.
 - The three homepage gateways reveal on scroll. Content stays visible without JavaScript, and reduced-motion preferences disable the decorative movement.
 
@@ -30,6 +30,9 @@ Open `http://localhost:8000/`.
 | `community.css` | Community sections, destination pages and interaction styles |
 | `main.js` | Progressive scroll reveal for the homepage gateways |
 | `assets/paris-editorial.webp` | Paris hero artwork |
+| `assets/member-*.webp` | Six fictional member portraits |
+| `assets/event-*.webp`, `assets/story-*.webp` | Supporting scenes for activities and stories |
+| `docs/member-image-prompts.md`, `docs/scene-image-prompts.md` | Image prompts, saved paths and generation provenance |
 | `scripts/version_assets.py` | Adds content-based CSS/JS version URLs to staged pages |
 | `.github/workflows/pages.yml` | Automatic GitHub Pages deployment |
 
@@ -46,5 +49,6 @@ Use relative URLs for local assets so the site works under the repository's `/PI
 - The association name was checked against [PIE's Instagram profile](https://www.instagram.com/pie_upc/) on 15 September 2026.
 - Typography uses Instrument Serif and DM Sans through Google Fonts, with fallback fonts.
 - The Paris artwork was generated for this homepage. It is not a documentary photograph of a PIE event.
+- The portraits and subpage scene images are AI-generated examples, as labeled on each page. They do not depict actual PIE members or events. Generation prompts and file details are in [member image prompts](docs/member-image-prompts.md) and [scene image prompts](docs/scene-image-prompts.md).
 
 This repository is the working source for the website.
