@@ -23,13 +23,27 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .gateway-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(24px, 2.6vw, 44px); }
 .gateway { min-width: 0; display: flex; flex-direction: column; }
 .gateway h3 { margin: 0; font: 400 clamp(34px, 3vw, 48px)/1.05 var(--serif); letter-spacing: -.015em; }
-.gateway-card-link { display: block; margin-top: 24px; text-decoration: none; }
-.gateway-photo { margin: 0; aspect-ratio: 4 / 3; overflow: hidden; background: var(--members-paper); }
+.gateway-description { margin: 14px 0 24px; min-height: 42px; color: var(--secondary); font-size: 13px; line-height: 1.65; }
+.gateway-composition { flex: 1; }
+.gateway-photo { margin: 0 0 0 28px; aspect-ratio: 4 / 3; background: var(--members-paper); }
+.gateway-image-link { display: block; width: 100%; height: 100%; overflow: hidden; }
 .gateway-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .gateway--events .gateway-photo { background: var(--events-paper); }
 .gateway--experiences .gateway-photo { background: var(--stories-paper); }
-.gateway-card-link:hover .gateway-link { color: var(--blue); border-bottom-color: var(--blue); }
-.gateway-card-link:active .gateway-photo img { opacity: .92; }
+.gateway-image-link:active img { opacity: .92; }
+.gateway-copy { position: relative; z-index: 1; width: calc(100% - 24px); min-height: 228px; margin-top: -34px; padding: 25px 22px 12px 0; background: var(--paper); }
+.gateway-kicker { margin: 0 0 20px; color: var(--blue); font-size: 10px; font-weight: 600; line-height: 1.7; letter-spacing: .075em; }
+.gateway-kicker > span { margin-inline: 7px; color: #909bb4; }
+.gateway-people { padding: 0; margin: 0; list-style: none; }
+.gateway-people li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 0 0 14px; }
+.gateway-people li + li { padding-top: 14px; border-top: 1px solid var(--line); }
+.gateway-people strong { display: block; font: 400 25px/1.2 var(--serif); }
+.gateway-people div > span { display: block; margin-top: 5px; color: var(--secondary); font-size: 11px; line-height: 1.5; }
+.gateway-status { flex: none; padding: 4px 8px; background: var(--members-paper); color: var(--blue); font-size: 10px; line-height: 1.5; }
+.gateway-status--alumni { background: var(--events-paper); color: #70583e; }
+.gateway-feature-title { margin: 0 0 16px; font: 400 clamp(32px, 2.8vw, 44px)/1.05 var(--serif); letter-spacing: -.015em; }
+.gateway-detail { margin: 0; color: var(--secondary); font-size: 11px; line-height: 1.7; }
+.gateway-quote { margin: 0 0 17px; font: 400 clamp(24px, 2.05vw, 32px)/1.18 var(--serif); letter-spacing: -.01em; }
 .gateway-link { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 62px; margin-top: 12px; border-bottom: 1px solid var(--line); text-decoration: none; font-size: 13px; font-weight: 500; }
 .gateway-link > span { font-size: 22px; font-weight: 400; color: var(--blue); }
 .gateway-link:hover { color: var(--blue); border-bottom-color: var(--blue); }
@@ -91,7 +105,7 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
   html { scroll-behavior: smooth; }
   .gateway-link, .site-nav a { transition: color .2s ease, border-color .2s ease; }
   .gateway-link > span { transition: transform .2s ease; }
-  .gateway-card-link:hover .gateway-link > span { transform: translate(3px, -3px); }
+  .gateway-link:hover > span { transform: translate(3px, -3px); }
   .gateway-photo img { transition: transform .45s cubic-bezier(.2,.7,.2,1); }
   .scroll-cue-arrow { animation: scroll-nudge 2.4s ease-in-out 3; }
   @keyframes scroll-nudge { 0%, 70%, 100% { transform: translateY(0); } 35% { transform: translateY(4px); } }
@@ -102,11 +116,13 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .gateway-card-link:hover .gateway-photo img { transform: scale(1.035); }
+  .gateway-image-link:hover img { transform: scale(1.035); }
 }
 
 @media (max-width: 1000px) and (min-width: 721px) {
   .gateway-grid { gap: 20px; }
+  .gateway-photo { margin-left: 16px; }
+  .gateway-copy { width: calc(100% - 12px); padding-right: 8px; }
   .member-card, .story-card { padding: 22px; }
 }
 
@@ -116,6 +132,10 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
   .discover-heading { display: block; margin-bottom: 36px; }
   .discover-heading .demo-note { margin-top: 22px; max-width: none; }
   .gateway-grid { grid-template-columns: 1fr; gap: 44px; }
+  .gateway-description { min-height: 0; margin-bottom: 22px; }
+  .gateway-copy { min-height: 0; padding-bottom: 4px; }
+  .gateway-feature-title { font-size: 36px; }
+  .gateway-quote { max-width: 28ch; font-size: 28px; }
   .inner-page .masthead { flex-wrap: wrap; gap: 12px; padding: 22px 0; }
   .site-nav { gap: 16px; flex-wrap: wrap; }
   .site-nav a { font-size: 11px; min-height: 34px; }
