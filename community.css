@@ -76,6 +76,9 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .member-status { display: inline-flex; align-items: center; padding: 4px 9px; border-radius: 20px; font-size: 10px; font-weight: 500; line-height: 1.5; }
 .member-status--active { background: var(--members-paper); color: var(--blue); }
 .member-status--alumni { background: var(--events-paper); color: #70583e; }
+.member-activity { display: flex; gap: 2px; margin-top: 9px; }
+.member-activity i { display: block; width: 12px; height: 12px; background-color: #ccd5ec; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.6l3.2 6.6 7.2 1-5.2 5 1.2 7.2-6.4-3.4-6.4 3.4 1.2-7.2-5.2-5 7.2-1z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.6l3.2 6.6 7.2 1-5.2 5 1.2 7.2-6.4-3.4-6.4 3.4 1.2-7.2-5.2-5 7.2-1z'/%3E%3C/svg%3E") center / contain no-repeat; }
+.member-activity i.is-filled { background-color: var(--blue); }
 .member-role { margin: 7px 0 9px; font-size: 10px; font-weight: 500; line-height: 1.6; color: var(--secondary); }
 .member-card h2 { margin: 0; font: 400 28px/1.1 var(--serif); }
 .member-card .tag-list { margin-bottom: 24px; }
