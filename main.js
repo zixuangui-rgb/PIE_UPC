@@ -37,9 +37,9 @@
   const summaryEl = document.getElementById('finder-results-summary');
   if (!form || !input || !results || !grid || !noteEl) return;
 
-  // Add the deployed Cloudflare Worker URL at the front once it exists, e.g.
-  // 'https://pie-recommend.<account>.workers.dev/recommend'
+  // Production endpoint first; the local dev proxy is the fallback for development.
   const AI_ENDPOINTS = [
+    'https://pie-recommend.zixuangui.workers.dev/recommend',
     'http://localhost:8787/recommend'
   ];
   const RTL_LANGS = new Set(['ar', 'fa', 'he', 'ur']);
