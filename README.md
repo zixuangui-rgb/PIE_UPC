@@ -30,11 +30,14 @@ Open `http://localhost:8000/`.
 | `community.css` | Community sections, destination pages and interaction styles |
 | `main.js` | Progressive scroll reveal for the homepage gateways |
 | `assets/paris-editorial.webp` | Paris hero artwork |
+| `scripts/version_assets.py` | Adds content-based CSS/JS version URLs to staged pages |
 | `.github/workflows/pages.yml` | Automatic GitHub Pages deployment |
 
 ## Deployment
 
 The GitHub Actions workflow publishes all four pages, the stylesheets, script and artwork to GitHub Pages after each push to `main`. It can also be run manually from the Actions tab.
+
+Before publishing, `scripts/version_assets.py` adds a content hash to each local stylesheet and script URL (for example, `community.css?v=...`). Updates and rollbacks therefore request the matching assets instead of reusing a browser's cached version. This only changes staged HTML in `_site`; source pages and the website layout stay unchanged.
 
 Use relative URLs for local assets so the site works under the repository's `/PIE_UPC/` path.
 

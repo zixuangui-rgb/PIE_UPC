@@ -34,6 +34,7 @@ jobs:
           mkdir -p _site/assets
           cp index.html members.html events.html experiences.html style.css community.css main.js .nojekyll _site/
           cp assets/paris-editorial.webp _site/assets/
+          python3 scripts/version_assets.py _site
 
       - name: Upload site
         uses: actions/upload-pages-artifact@v4
