@@ -369,3 +369,20 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
   .event-badge { bottom: 8px; left: 8px; padding: 6px 9px; font-size: 9px; }
   .ideas { padding-bottom: 60px; }
 }
+
+/* Idea cards: structured details and editing. */
+.idea-title { margin: 0 0 8px; font: 400 20px/1.25 var(--serif); letter-spacing: -.01em; }
+.idea-tags { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 10px; }
+.idea-tag { padding: 4px 9px; border: 1px solid #e0e5ee; color: var(--secondary); font-size: 11px; line-height: 1.5; }
+.idea-delete + .idea-delete { margin-left: 14px; }
+.idea-delete:first-of-type { margin-left: auto; }
+.idea-details { margin: 18px 0 0; border-top: 1px solid var(--line); }
+.idea-details summary { padding: 14px 0 4px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--blue); }
+.idea-details[open] summary { padding-bottom: 14px; }
+.idea-details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 20px; margin-bottom: 4px; }
+.idea-details .join-field label { font-size: 11.5px; }
+.idea-details .join-check { margin-top: 14px; }
+
+@media (max-width: 720px) {
+  .idea-details-grid { grid-template-columns: minmax(0, 1fr); }
+}

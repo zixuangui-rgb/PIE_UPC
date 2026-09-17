@@ -727,6 +727,15 @@
     const signin = document.getElementById('ideas-signin');
     const text = document.getElementById('idea-text');
     const nameField = document.getElementById('idea-name');
+    const titleField = document.getElementById('idea-title');
+    const dateField = document.getElementById('idea-date');
+    const timeField = document.getElementById('idea-time');
+    const placeField = document.getElementById('idea-place');
+    const flexibleField = document.getElementById('idea-flexible');
+    const detailsBox = document.getElementById('idea-details');
+    const cancelEdit = document.getElementById('idea-cancel');
+    const submitLabel = document.querySelector('#idea-submit .finder-submit-label');
+    let editingId = '';
     const hint = document.getElementById('idea-hint');
     const submit = document.getElementById('idea-submit');
     let myProfileId = null;
@@ -744,8 +753,36 @@
       for (const idea of ideas) {
         const card = document.createElement('article');
         card.className = 'idea-card';
+        if (idea.title) {
+          const heading = document.createElement('h3');
+          heading.className = 'idea-title';
+          heading.textContent = idea.title;
+          card.appendChild(heading);
+        }
         const body = document.createElement('p');
         body.textContent = idea.text;
+        card.appendChild(body);
+
+        const chips = [];
+        if (idea.date) {
+          const when = new Date(idea.date + 'T00:00:00');
+          chips.push(when.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }));
+        }
+        if (idea.time) chips.push(idea.time);
+        if (idea.place) chips.push(idea.place);
+        if (idea.dateFlexible) chips.push('Date flexible');
+        if (chips.length) {
+          const tags = document.createElement('p');
+          tags.className = 'idea-tags';
+          for (const value of chips) {
+            const tag = document.createElement('span');
+            tag.className = 'idea-tag';
+            tag.textContent = value;
+            tags.appendChild(tag);
+          }
+          card.appendChild(tags);
+        }
+
         const meta = document.createElement('p');
         meta.className = 'idea-meta';
         if (idea.authorId && idea.authorName) {
@@ -762,6 +799,11 @@
         when.textContent = new Date(idea.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
         meta.appendChild(when);
         if (myProfileId && idea.authorId === myProfileId) {
+          const edit = document.createElement('button');
+          edit.type = 'button';
+          edit.className = 'idea-delete';
+          edit.textContent = 'Edit';
+          edit.addEventListener('click', () => startEdit(idea));
           const del = document.createElement('button');
           del.type = 'button';
           del.className = 'idea-delete';
@@ -770,12 +812,45 @@
             const { ok } = await apiFetch('/ideas/' + idea.id, { method: 'DELETE', headers: { Authorization: 'Bearer ' + session.token } });
             if (ok) loadIdeas();
           });
-          meta.appendChild(del);
+          meta.append(edit, del);
         }
-        card.append(body, meta);
+        card.appendChild(meta);
         list.appendChild(card);
       }
     };
+
+    const resetForm = () => {
+      editingId = '';
+      text.value = '';
+      titleField.value = '';
+      dateField.value = '';
+      timeField.value = '';
+      placeField.value = '';
+      flexibleField.checked = false;
+      detailsBox.open = false;
+      submitLabel.textContent = 'Submit idea';
+      cancelEdit.hidden = true;
+    };
+
+    const startEdit = (idea) => {
+      editingId = idea.id;
+      text.value = idea.text || '';
+      titleField.value = idea.title || '';
+      dateField.value = idea.date || '';
+      timeField.value = idea.time || '';
+      placeField.value = idea.place || '';
+      flexibleField.checked = !!idea.dateFlexible;
+      detailsBox.open = true;
+      submitLabel.textContent = 'Save changes';
+      cancelEdit.hidden = false;
+      setHint('Editing your idea.', null);
+      ideaForm.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    };
+
+    cancelEdit.addEventListener('click', () => {
+      resetForm();
+      setHint('Edit cancelled.', null);
+    });
 
     const loadIdeas = async () => {
       const { ok, data } = await apiFetch('/ideas');
@@ -800,21 +875,33 @@
       const value = text.value.trim();
       if (value.length < 4) { setHint('Please write a few more words.', 'error'); return; }
       submit.disabled = true;
-      setHint('Posting…');
-      const { ok, data } = await apiFetch('/ideas', {
+      setHint(editingId ? 'Saving…' : 'Posting…');
+      const payload = {
+        text: value,
+        name: nameField.value.trim(),
+        title: titleField.value.trim(),
+        date: dateField.value,
+        time: timeField.value,
+        place: placeField.value.trim(),
+        dateFlexible: flexibleField.checked
+      };
+      const target = editingId ? '/ideas/' + editingId : '/ideas';
+      const { ok, data } = await apiFetch(target, {
         method: 'POST',
         headers: { Authorization: 'Bearer ' + session.token },
-        body: JSON.stringify({ text: value, name: nameField.value.trim() })
+        body: JSON.stringify(payload)
       });
       submit.disabled = false;
-      if (!ok) { setHint((data && data.error) || 'Could not post the idea.', 'error'); return; }
-      text.value = '';
-      setHint('Posted — your idea is on the board.', 'ok');
+      if (!ok) { setHint((data && data.error) || 'Could not save the idea.', 'error'); return; }
+      const wasEditing = !!editingId;
+      const saved = data && data.idea ? data.idea : null;
+      resetForm();
+      setHint(wasEditing ? 'Saved — the idea has been updated.' : 'Posted — your idea is on the board.', 'ok');
       // The write is visible to this browser immediately; the shared list
       // catches up once the edge cache refreshes.
-      if (data && data.idea) {
-        const others = ideasCache.filter((item) => item.id !== data.idea.id);
-        renderIdeas([data.idea, ...others]);
+      if (saved) {
+        const others = ideasCache.filter((item) => item.id !== saved.id);
+        renderIdeas(wasEditing ? others.map((item) => item.id === saved.id ? saved : item).concat([]) : [saved, ...others]);
       } else {
         loadIdeas();
       }

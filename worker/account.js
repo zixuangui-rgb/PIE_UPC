@@ -140,6 +140,42 @@ async function sessionFrom(request, env) {
   return session && session.email ? { token, ...session } : null;
 }
 
+async function ownsIdea(env, session, record) {
+  if (!record || !record.authorId) return false;
+  const profileId = await env.PIE_KV.get(key.email(session.email));
+  const claimed = findClaimableByEmail(session.email);
+  return (profileId && record.authorId === profileId) || (claimed && record.authorId === claimed.id);
+}
+
+// Validates the optional idea details (fields 3–6 of the submission form).
+function parseIdea(body) {
+  const text = clean(body.text, IDEA_LIMIT);
+  if (text.length < 4) return { error: 'please write a few more words' };
+  const dateFlexible = body.dateFlexible === true;
+  let date = '';
+  if (typeof body.date === 'string' && body.date.trim()) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(body.date.trim())) return { error: 'please pick a valid date' };
+    const today = new Date().toISOString().slice(0, 10);
+    if (body.date.trim() < today) return { error: 'the suggested date is already in the past' };
+    date = body.date.trim();
+  }
+  let time = '';
+  if (typeof body.time === 'string' && body.time.trim()) {
+    if (!/^\d{2}:\d{2}$/.test(body.time.trim())) return { error: 'please pick a valid time' };
+    time = body.time.trim();
+  }
+  return {
+    value: {
+      text,
+      title: clean(body.title, 60),
+      date,
+      dateFlexible,
+      time,
+      place: clean(body.place, 60)
+    }
+  };
+}
+
 export async function handleAccount(request, env, url) {
   const path = url.pathname;
 
@@ -319,8 +355,8 @@ export async function handleAccount(request, env, url) {
     if (!session) return json({ error: 'only verified members can post an idea' }, 401);
     let body = {};
     try { body = await request.json(); } catch { body = {}; }
-    const text = clean(body.text, IDEA_LIMIT);
-    if (text.length < 4) return json({ error: 'please write a few more words' }, 400);
+    const parsed = parseIdea(body);
+    if (parsed.error) return json({ error: parsed.error }, 400);
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
     if (!(await bump(env, `idea-hour:${session.email}`, MAX_IDEAS_PER_HOUR, 3600))) return json({ error: 'you have posted several ideas already, please try again later' }, 429);
     if (!(await bump(env, `idea-day:${session.email}`, MAX_IDEAS_PER_DAY, 86400))) return json({ error: 'daily idea limit reached' }, 429);
@@ -332,7 +368,7 @@ export async function handleAccount(request, env, url) {
     const name = clean(body.name, 40) || (own && own.name) || (claimed && claimed.name) || '';
     const record = {
       id: 'i-' + randomToken().slice(0, 12),
-      text,
+      ...parsed.value,
       authorId: profileId || (claimed ? claimed.id : ''),
       authorName: name,
       createdAt: Date.now()
@@ -341,16 +377,35 @@ export async function handleAccount(request, env, url) {
     return json({ idea: record });
   }
 
+  // ---- edit your own idea ---------------------------------------------------
+  if (path.startsWith('/ideas/') && request.method === 'POST') {
+    const session = await sessionFrom(request, env);
+    if (!session) return json({ error: 'not signed in' }, 401);
+    const id = clean(path.slice('/ideas/'.length), 40);
+    const record = JSON.parse((await env.PIE_KV.get(`idea:${id}`)) || 'null');
+    if (!record) return json({ error: 'idea not found' }, 404);
+    if (!(await ownsIdea(env, session, record))) return json({ error: 'you can only edit your own idea' }, 403);
+    let body = {};
+    try { body = await request.json(); } catch { body = {}; }
+    const parsed = parseIdea(body);
+    if (parsed.error) return json({ error: parsed.error }, 400);
+    const updated = {
+      ...record,
+      ...parsed.value,
+      authorName: clean(body.name, 40) || record.authorName || '',
+      updatedAt: Date.now()
+    };
+    await env.PIE_KV.put(`idea:${id}`, JSON.stringify(updated));
+    return json({ idea: updated });
+  }
+
   if (path.startsWith('/ideas/') && request.method === 'DELETE') {
     const session = await sessionFrom(request, env);
     if (!session) return json({ error: 'not signed in' }, 401);
     const id = clean(path.slice('/ideas/'.length), 40);
     const record = JSON.parse((await env.PIE_KV.get(`idea:${id}`)) || 'null');
     if (!record) return json({ error: 'idea not found' }, 404);
-    const profileId = await env.PIE_KV.get(key.email(session.email));
-    const claimed = findClaimableByEmail(session.email);
-    const mine = (profileId && record.authorId === profileId) || (claimed && record.authorId === claimed.id);
-    if (!mine) return json({ error: 'you can only delete your own idea' }, 403);
+    if (!(await ownsIdea(env, session, record))) return json({ error: 'you can only delete your own idea' }, 403);
     await env.PIE_KV.delete(`idea:${id}`);
     return json({ deleted: true });
   }
