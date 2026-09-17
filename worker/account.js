@@ -102,7 +102,7 @@ function publicRecord(record) {
     country: record.country || '',
     summary: record.summary || '',
     tags: record.tags || [],
-    email: record.emailPublic ? record.email : '',
+    email: record.email || '',
     // Uploaded photos are served from KV; claimed profiles keep their asset path.
     photo: (typeof record.photo === 'string' && record.photo.startsWith('data:'))
       ? `/photo/${record.id}?v=${record.updatedAt}`
@@ -273,7 +273,6 @@ export async function handleAccount(request, env, url) {
     const record = {
       id,
       email: session.email,
-      emailPublic: body.emailPublic === true,
       name,
       role: clean(body.role, FIELD_LIMITS.role),
       country: clean(body.country, FIELD_LIMITS.country),

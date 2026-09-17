@@ -24,6 +24,7 @@
           <a href="./members.html">Members</a>
           <a href="./events.html">Events</a>
           <a href="./experiences.html">Experiences</a>
+          <a class="site-nav-account" href="./join.html" data-account-link>Join</a>
         </nav>
       </header>
       <main id="main-content">
@@ -35,6 +36,15 @@
         </header>
 
         <section class="join" aria-label="Join or edit your profile">
+          <div class="join-step join-signedin" id="join-signed-in" hidden>
+            <p class="join-step-number">SIGNED IN</p>
+            <div class="join-signedin-row">
+              <p class="join-signedin-who" id="join-signed-in-who"></p>
+              <button type="button" class="join-link" id="join-top-signout">Sign out</button>
+              <button type="button" class="join-link" id="join-switch">Switch account</button>
+            </div>
+          </div>
+
           <div class="join-step" id="join-step-email">
             <p class="join-step-number">01</p>
             <h2>Your email</h2>
@@ -90,7 +100,7 @@
                 </div>
               </div>
             </div>
-            <label class="join-check"><input type="checkbox" id="join-email-public" /> <span>Show my email address on my public profile</span></label>
+            <p class="join-hint join-note-static">Your email address is shown on your public profile.</p>
             <div class="join-actions">
               <button type="submit" class="finder-submit" id="join-save"><span class="finder-submit-label">Save profile</span></button>
               <a class="join-link" href="./members.html">View the directory</a>

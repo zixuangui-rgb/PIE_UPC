@@ -308,6 +308,17 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .join-photo-row img[hidden] { display: none; }
 .join-photo-row input[type="file"] { flex: 1; min-width: 200px; padding: 10px 12px; background: var(--paper); border: 1px dashed var(--line); border-radius: 2px; font: 400 13px var(--sans); }
 .join-check { display: flex; align-items: center; gap: 10px; margin: 22px 0 0; font-size: 13px; color: var(--secondary); }
+.join-note-static { margin: 18px 0 0; color: var(--secondary); font-size: 11.5px; }
+.join-signedin { padding: 18px clamp(22px, 2.4vw, 34px); background: var(--members-paper); border-color: transparent; }
+.join-signedin .join-step-number { margin-bottom: 8px; }
+.join-signedin-row { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; }
+.join-signedin-who { margin: 0; font: 400 17px/1.4 var(--serif); color: var(--ink); }
+.site-nav-account { color: var(--blue) !important; font-weight: 500; border-bottom: 1px solid transparent; }
+.site-nav-account:hover { border-bottom-color: var(--blue) !important; }
+.member-card--you { border-color: var(--blue); }
+.member-you { display: inline-block; margin: 8px 8px 0 0; padding: 3px 8px; border-radius: 20px; background: var(--blue); color: #fff; font: 500 10px/1.5 var(--sans); }
+.member-you-edit { display: inline-block; margin-top: 8px; color: var(--blue); font: 500 11px/1.5 var(--sans); text-decoration: none; }
+.member-you-edit:hover { text-decoration: underline; }
 .join-actions { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line); }
 .join-link { background: none; border: 0; padding: 0; color: var(--secondary); font: 500 13px var(--sans); text-decoration: none; cursor: pointer; }
 .join-link:hover { color: var(--blue); }

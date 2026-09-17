@@ -339,6 +339,66 @@
 
   const photoUrl = (value) => (value && value.startsWith('/photo/') ? ACCOUNT_API + value : value);
   const initials = (name) => String(name || '?').split(/\s+/).slice(0, 2).map((part) => part.charAt(0).toUpperCase()).join('');
+  const firstName = (name) => String(name || '').trim().split(/\s+/)[0] || '';
+
+  // ---------------------------------------------------------------------------
+  // Shared session state: every page asks once who is signed in, then updates
+  // the account links so the site never offers "Join" to a signed-in member.
+  // ---------------------------------------------------------------------------
+  const session = { token: localStorage.getItem(TOKEN_KEY) || '', email: '', profileId: null, profile: null };
+  let sessionPending = null;
+
+  const clearSession = () => {
+    localStorage.removeItem(TOKEN_KEY);
+    session.token = '';
+    session.email = '';
+    session.profileId = null;
+    session.profile = null;
+  };
+
+  const loadSession = () => {
+    if (sessionPending) return sessionPending;
+    sessionPending = session.token
+      ? apiFetch('/me', { headers: { Authorization: 'Bearer ' + session.token } }).then(({ ok, data }) => {
+          if (!ok || !data) { clearSession(); return null; }
+          session.email = data.email || '';
+          session.profileId = data.profileId || null;
+          session.profile = data.profile || null;
+          return session;
+        })
+      : Promise.resolve(null);
+    return sessionPending;
+  };
+
+  function applyAccountUI() {
+    loadSession().then((active) => {
+      if (!active) return;
+      const name = firstName(active.profile && active.profile.name) || 'there';
+      for (const link of document.querySelectorAll('[data-account-link]')) {
+        link.textContent = `Hi, ${name} · My profile`;
+      }
+      // Copy that only makes sense before signing in.
+      for (const el of document.querySelectorAll('[data-account-hint]')) el.hidden = true;
+      for (const el of document.querySelectorAll('[data-account-cta]')) el.textContent = 'Edit your profile';
+      // Mark the signed-in member's own card in the directory.
+      if (active.profileId) {
+        const card = document.getElementById(active.profileId);
+        if (card && !card.querySelector('.member-you')) {
+          card.classList.add('member-card--you');
+          const tag = document.createElement('span');
+          tag.className = 'member-you';
+          tag.textContent = 'This is you';
+          const link = document.createElement('a');
+          link.className = 'member-you-edit';
+          link.href = './join.html';
+          link.innerHTML = 'Edit <span aria-hidden="true">↗</span>';
+          const identity = card.querySelector('.member-identity');
+          if (identity) identity.append(tag, link);
+        }
+      }
+    });
+  }
+  applyAccountUI();
 
   // One shared request for the registered profiles, reused by the pool merge
   // and the directory merge.
@@ -397,44 +457,57 @@
   // Members page: apply registered edits to existing cards and append new members.
   const memberGrid = document.getElementById('member-grid');
   if (memberGrid) {
+    const setField = (card, selector, value, hideWhenEmpty) => {
+      const el = card.querySelector(selector);
+      if (!el) return;
+      el.textContent = value || '';
+      if (hideWhenEmpty) el.hidden = !value;
+    };
+
+    // The server returns the member's complete profile, so every field is
+    // applied as written — clearing a field clears it on the card too.
+    const applyPatch = (card, patch) => {
+      setField(card, 'h2', patch.name, false);
+      setField(card, '.member-role', [patch.role, patch.country].filter(Boolean).join(' · '), true);
+      setField(card, '.card-summary', patch.summary, true);
+
+      const list = card.querySelector('.tag-list');
+      if (list) {
+        list.innerHTML = '';
+        for (const tag of patch.tags || []) {
+          const li = document.createElement('li');
+          li.textContent = tag;
+          list.appendChild(li);
+        }
+        list.hidden = !(patch.tags || []).length;
+      }
+
+      const contact = card.querySelector('.member-contact');
+      const dd = card.querySelector('.member-contact dd');
+      if (contact && dd) {
+        dd.innerHTML = '';
+        if (patch.email) {
+          const link = document.createElement('a');
+          link.href = 'mailto:' + patch.email;
+          link.textContent = patch.email;
+          dd.appendChild(link);
+          contact.hidden = false;
+        } else {
+          contact.hidden = true;
+        }
+      }
+
+      if (patch.photo) {
+        const img = card.querySelector('.member-portrait img');
+        if (img) img.src = photoUrl(patch.photo);
+      }
+    };
+
     profilesOnce().then(({ ok, data }) => {
       if (!ok || !data) return;
       for (const [id, patch] of Object.entries(data.patched || {})) {
         const card = document.getElementById(id);
-        if (!card) continue;
-        const setText = (selector, value) => {
-          const el = card.querySelector(selector);
-          if (el && value) el.textContent = value;
-        };
-        setText('h2', patch.name);
-        const role = [patch.role, patch.country].filter(Boolean).join(' · ');
-        setText('.member-role', role);
-        setText('.card-summary', patch.summary);
-        if (patch.tags && patch.tags.length) {
-          const list = card.querySelector('.tag-list');
-          if (list) {
-            list.innerHTML = '';
-            for (const tag of patch.tags) {
-              const li = document.createElement('li');
-              li.textContent = tag;
-              list.appendChild(li);
-            }
-          }
-        }
-        if (patch.email) {
-          const dd = card.querySelector('.member-contact dd');
-          if (dd) {
-            dd.innerHTML = '';
-            const link = document.createElement('a');
-            link.href = 'mailto:' + patch.email;
-            link.textContent = patch.email;
-            dd.appendChild(link);
-          }
-        }
-        if (patch.photo) {
-          const img = card.querySelector('.member-portrait img');
-          if (img) img.src = photoUrl(patch.photo);
-        }
+        if (card) applyPatch(card, patch);
       }
       for (const record of data.dynamic || []) memberGrid.insertAdjacentHTML('beforeend', dynamicCard(record));
     });
@@ -448,12 +521,12 @@
       emailStep: el('join-step-email'), email: el('join-email'), send: el('join-send'), emailHint: el('join-email-hint'),
       codeStep: el('join-step-code'), code: el('join-code'), verify: el('join-verify'),
       codeHint: el('join-code-hint'), verifyHint: el('join-verify-hint'),
+      signedIn: el('join-signed-in'), signedInWho: el('join-signed-in-who'), switchAccount: el('join-switch'),
       profileHint: el('join-profile-hint'), name: el('join-name'), role: el('join-role'), country: el('join-country'),
       tags: el('join-tags'), summary: el('join-summary'), photo: el('join-photo'), preview: el('join-photo-preview'),
-      emailPublic: el('join-email-public'), save: el('join-save'), saveHint: el('join-save-hint'),
-      signout: el('join-signout'), del: el('join-delete')
+      save: el('join-save'), saveHint: el('join-save-hint'),
+      signout: el('join-signout'), topSignout: el('join-top-signout'), del: el('join-delete')
     };
-    let token = localStorage.getItem(TOKEN_KEY) || '';
     let photoData = '';
 
     // The page explains the demo behaviour only while no mail key is configured.
@@ -474,23 +547,33 @@
     };
 
     const fillForm = (profile) => {
-      if (!profile) return;
-      ui.name.value = profile.name || '';
-      ui.role.value = profile.role || '';
-      ui.country.value = profile.country || '';
-      ui.tags.value = (profile.tags || []).join(', ');
-      ui.summary.value = profile.summary || '';
-      ui.emailPublic.checked = !!profile.email;
-      ui.del.hidden = !profile.dynamic;
-      if (profile.photo) {
-        ui.preview.src = photoUrl(profile.photo);
-        ui.preview.hidden = false;
-      }
+      ui.name.value = (profile && profile.name) || '';
+      ui.role.value = (profile && profile.role) || '';
+      ui.country.value = (profile && profile.country) || '';
+      ui.tags.value = ((profile && profile.tags) || []).join(', ');
+      ui.summary.value = (profile && profile.summary) || '';
+      ui.del.hidden = !(profile && profile.dynamic);
+      ui.preview.hidden = !(profile && profile.photo);
+      if (profile && profile.photo) ui.preview.src = photoUrl(profile.photo);
     };
 
-    const showProfileStep = () => {
+    const showSignedIn = (email, message) => {
+      ui.emailStep.hidden = true;
       ui.codeStep.hidden = true;
+      ui.signedIn.hidden = false;
+      ui.signedInWho.textContent = email;
       joinForm.hidden = false;
+      ui.profileHint.textContent = message;
+    };
+
+    const showSignedOut = (message, kind) => {
+      ui.emailStep.hidden = false;
+      ui.codeStep.hidden = true;
+      ui.signedIn.hidden = true;
+      joinForm.hidden = true;
+      ui.email.value = '';
+      ui.code.value = '';
+      if (message) status(ui.emailHint, message, kind || 'ok');
     };
 
     ui.send.addEventListener('click', async () => {
@@ -537,14 +620,16 @@
         status(ui.verifyHint, (data && data.error) || 'Verification failed.', 'error');
         return;
       }
-      token = data.token;
-      localStorage.setItem(TOKEN_KEY, token);
+      session.token = data.token;
+      localStorage.setItem(TOKEN_KEY, data.token);
+      session.email = email;
+      session.profileId = data.profileId || null;
+      session.profile = data.profile || null;
       status(ui.verifyHint, 'Verified.', 'ok');
       fillForm(data.profile);
-      ui.profileHint.textContent = data.isExisting
-        ? `Signed in as ${email}. This address is linked to the existing profile “${data.profile ? data.profile.name : ''}” — saving updates that card.`
-        : `Signed in as ${email}. Saving adds a new profile to the member directory.`;
-      showProfileStep();
+      showSignedIn(email, data.isExisting
+        ? `This address is linked to the existing profile “${data.profile ? data.profile.name : ''}” — saving updates that card.`
+        : 'Saving adds a new profile to the member directory.');
       joinForm.scrollIntoView({ block: 'start', behavior: 'smooth' });
     });
 
@@ -577,15 +662,14 @@
         role: ui.role.value.trim(),
         country: ui.country.value.trim(),
         summary: ui.summary.value.trim(),
-        tags: ui.tags.value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 8),
-        emailPublic: ui.emailPublic.checked
+        tags: ui.tags.value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 8)
       };
       if (photoData) payload.photo = photoData;
       ui.save.disabled = true;
       status(ui.saveHint, 'Saving…');
       const { ok, data } = await apiFetch('/profile', {
         method: 'POST',
-        headers: { Authorization: 'Bearer ' + token },
+        headers: { Authorization: 'Bearer ' + session.token },
         body: JSON.stringify(payload)
       });
       ui.save.disabled = false;
@@ -594,48 +678,49 @@
         return;
       }
       status(ui.saveHint, 'Saved. Your profile will appear in the member directory within a minute.', 'ok');
-      ui.del.hidden = !(data && data.profile && data.profile.dynamic);
+      if (data && data.profile) {
+        session.profile = data.profile;
+        session.profileId = data.profile.id;
+        ui.del.hidden = !data.profile.dynamic;
+      }
       photoData = '';
     });
 
-    ui.signout.addEventListener('click', () => {
-      localStorage.removeItem(TOKEN_KEY);
-      token = '';
-      joinForm.hidden = true;
-      ui.codeStep.hidden = true;
+    const signOut = (message) => {
+      clearSession();
+      sessionPending = null;
       ui.del.hidden = true;
-      status(ui.emailHint, 'Signed out.');
+      photoData = '';
+      showSignedOut(message);
       ui.emailStep.scrollIntoView({ block: 'start', behavior: 'smooth' });
-    });
+    };
+
+    ui.signout.addEventListener('click', () => signOut('Signed out.'));
+    if (ui.topSignout) ui.topSignout.addEventListener('click', () => signOut('Signed out.'));
+    ui.switchAccount.addEventListener('click', () => signOut('Signed out. Enter another address to continue.'));
 
     ui.del.addEventListener('click', async () => {
       if (!window.confirm('Delete your profile from the directory? This cannot be undone.')) return;
-      const { ok } = await apiFetch('/profile', { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
+      const { ok } = await apiFetch('/profile', { method: 'DELETE', headers: { Authorization: 'Bearer ' + session.token } });
       if (!ok) {
         status(ui.saveHint, 'Could not delete the profile.', 'error');
         return;
       }
-      localStorage.removeItem(TOKEN_KEY);
-      token = '';
-      joinForm.hidden = true;
-      status(ui.emailHint, 'Your profile was deleted.', 'ok');
+      signOut('Your profile was deleted.');
     });
 
     // Resume an existing session so returning members land straight on the form.
-    if (token) {
-      apiFetch('/me', { headers: { Authorization: 'Bearer ' + token } }).then(({ ok, data }) => {
-        if (!ok || !data) {
-          token = '';
-          localStorage.removeItem(TOKEN_KEY);
-          return;
-        }
-        ui.email.value = data.email || '';
-        fillForm(data.profile);
-        ui.profileHint.textContent = data.profileId
-          ? `Signed in as ${data.email}. Saving updates your existing card.`
-          : `Signed in as ${data.email}. Saving adds a new profile to the directory.`;
-        showProfileStep();
-      });
-    }
+    const hadToken = !!session.token;
+    loadSession().then((active) => {
+      if (!active) {
+        showSignedOut(hadToken ? 'Your session expired — please verify your email again.' : '', hadToken ? 'error' : null);
+        return;
+      }
+      ui.email.value = active.email;
+      fillForm(active.profile);
+      showSignedIn(active.email, active.profileId
+        ? 'Saving updates your existing card in the directory.'
+        : 'Saving adds a new profile to the member directory.');
+    });
   }
 })();
