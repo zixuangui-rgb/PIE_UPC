@@ -20,6 +20,8 @@ const SESSION_TTL = 60 * 60 * 24 * 30;
 const MAX_ATTEMPTS = 5;
 const MAX_CODE_PER_EMAIL_HOUR = 3;
 const MAX_CODE_PER_IP_HOUR = 10;
+const CODE_COOLDOWN_SECONDS = 60;   // minimum gap between two requests for one address
+const MAX_CODES_PER_DAY = 200;      // protects the mail provider's daily quota
 const MAX_PHOTO_CHARS = 400 * 1024;   // base64 data URL cap (~300 KB image)
 const FIELD_LIMITS = { name: 60, role: 60, country: 40, summary: 320, tags: 8, tag: 30, email: 120 };
 
@@ -138,6 +140,11 @@ async function sessionFrom(request, env) {
 export async function handleAccount(request, env, url) {
   const path = url.pathname;
 
+  // ---- service configuration (used by the join page to explain the flow) ----
+  if (path === '/config' && request.method === 'GET') {
+    return json({ emailEnabled: !!env.BREVO_API_KEY });
+  }
+
   // ---- request a verification code -----------------------------------------
   if (path === '/auth/code' && request.method === 'POST') {
     let body = {};
@@ -145,10 +152,17 @@ export async function handleAccount(request, env, url) {
     const email = clean(body.email, FIELD_LIMITS.email).toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ error: 'invalid email' }, 400);
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    if (await env.PIE_KV.get(`cooldown:${email}`)) {
+      return json({ error: 'a code was just sent — please wait a minute before requesting another one' }, 429);
+    }
     if (!(await bump(env, `code-email:${email}`, MAX_CODE_PER_EMAIL_HOUR, 3600))) return json({ error: 'too many codes for this address, try later' }, 429);
     if (!(await bump(env, `code-ip:${ip}`, MAX_CODE_PER_IP_HOUR, 3600))) return json({ error: 'too many requests, try later' }, 429);
+    if (!(await bump(env, `code-daily:${new Date().toISOString().slice(0, 10)}`, MAX_CODES_PER_DAY, 86400))) {
+      return json({ error: 'the daily verification limit has been reached, please try again tomorrow' }, 429);
+    }
     const code = randomCode();
     await env.PIE_KV.put(key.code(email), JSON.stringify({ code, attempts: 0 }), { expirationTtl: CODE_TTL });
+    await env.PIE_KV.put(`cooldown:${email}`, '1', { expirationTtl: CODE_COOLDOWN_SECONDS });
     try {
       const result = await sendCode(env, email, code);
       const known = findClaimableByEmail(email);

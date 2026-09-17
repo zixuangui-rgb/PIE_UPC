@@ -456,6 +456,17 @@
     let token = localStorage.getItem(TOKEN_KEY) || '';
     let photoData = '';
 
+    // The page explains the demo behaviour only while no mail key is configured.
+    const modeNote = document.getElementById('join-mode-note');
+    if (modeNote) {
+      apiFetch('/config').then(({ ok, data }) => {
+        if (!ok || !data) return;
+        if (data.emailEnabled) {
+          modeNote.textContent = 'We will email you a six-digit code. It expires after ten minutes.';
+        }
+      });
+    }
+
     const status = (node, text, kind) => {
       if (!node) return;
       node.textContent = text || '';
