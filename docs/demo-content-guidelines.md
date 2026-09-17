@@ -5,7 +5,7 @@ Prepared 2026-09-16. These are fictional examples for a community website demons
 ## Members
 
 - Preserve the six supplied real profiles, Sparlay Khan, Zixuan Gui, Tamara Matijević, Alessio SATURNINO, Amir M. Cheraghali and Meghna Varma, without inventing additional personal facts or attributing fictional stories to them. Omit contact details, nationality or languages that have not been supplied. General Community member / Active labels for the newer teammates describe their current participation without assigning a specific organizational office.
-- Twenty-two fictional members include international students, local welcome support, volunteers and alumni. Together with the six supplied real profiles, the directory has twenty-eight members. The six real profiles appear first, with the previous profiles retaining their content and relative order.
+- The twenty-two fictional demo members were removed on 2026-09-17 now that the real team is complete, together with their AI portraits. The directory holds the six real profiles only; new members add themselves through the join page.
 - Avoid the artificial one-person-per-country pattern. In the full illustrative directory, China and France each have four profiles; India and Morocco each have three; Brazil, Italy and Pakistan each have two; Germany, Japan, Mexico, Senegal, Serbia and Sweden each have one. Alessio's Italian nationality is supplied with his real profile. The uneven repetition suggests an ordinary mixed community rather than a collection of country representatives. Fictional-profile counts are a design choice, not a claim about PIE's actual demographic distribution.
 - Interleave the additions rather than sorting people into nationality groups. Members sharing a nationality have different interests and roles; nationality does not determine personality, education, appearance or availability.
 - Nationality, language and hobbies are separate profile fields. Hobbies are individual choices, not claims about people from a country. Not every profile must speak French or offer the same kind of help.
@@ -22,7 +22,7 @@ Prepared 2026-09-16. These are fictional examples for a community website demons
 
 ## Experiences
 
-- Each fictional author appears in the member directory. Stories reflect their established interests or Alumni status and do not imply that the sample future events already happened.
+- Story authors are fictional and, since the demo members were removed, no longer have directory profiles; the stories remain as clearly labelled examples. Stories reflect their established interests or Alumni status and do not imply that the sample future events already happened.
 - Preserve the original six stories exactly and add six distinct perspectives. Balance social successes with language hesitations, time and cost constraints, tiredness, and ordinary study routines. Do not make every story end in instant belonging or a life-changing lesson.
 - Aim for a specific situation, a small practical action and a modest personal outcome. Avoid instant-friendship promises, guaranteed cost savings or universal advice presented as fact.
 - Shared-kitchen content describes one person's routine, not health, legal or administrative advice. The alumni story separates past experience from current local arrangements.

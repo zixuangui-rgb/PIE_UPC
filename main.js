@@ -192,7 +192,7 @@
     }
     setMode('preview');
     if (summaryEl) summaryEl.hidden = true;
-    noteEl.textContent = 'Offline preview — keyword matching from the example directory. Run scripts/dev-proxy.mjs (or deploy the worker) for AI matching.';
+    noteEl.textContent = 'Offline preview — keyword matching from the directory. AI matching needs a connection to the PIE service.';
     results.removeAttribute('dir');
     results.removeAttribute('lang');
     results.hidden = false;
