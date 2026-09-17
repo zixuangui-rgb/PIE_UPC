@@ -695,16 +695,29 @@
   // ---------------------------------------------------------------------------
   // Events page: next monthly meeting date and the community idea board.
   // ---------------------------------------------------------------------------
+  const firstThursday = (year, month) => {
+    const d = new Date(year, month, 1);
+    d.setDate(1 + ((4 - d.getDay() + 7) % 7));   // 4 = Thursday
+    return d;
+  };
+  const nextMonthlyMeeting = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let candidate = firstThursday(today.getFullYear(), today.getMonth());
+    if (candidate < today) candidate = firstThursday(today.getFullYear(), today.getMonth() + 1);
+    return candidate;
+  };
   const meetingTargets = ['next-meeting-date', 'preview-meeting-date']
     .map((id) => document.getElementById(id))
     .filter(Boolean);
-  for (const nextMeeting of meetingTargets) {
-    const target = new Date();
-    target.setDate(1);
-    target.setDate(1 + ((4 - target.getDay() + 7) % 7));   // first Thursday
-    if (target < new Date(new Date().toDateString())) target.setMonth(target.getMonth() + 1, 1 + ((4 - new Date(target.getFullYear(), target.getMonth(), 1).getDay() + 7) % 7));
-    nextMeeting.setAttribute('datetime', target.toISOString().slice(0, 10));
-    nextMeeting.textContent = target.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+  if (meetingTargets.length) {
+    const meeting = nextMonthlyMeeting();
+    const label = meeting.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+    const iso = meeting.getFullYear() + '-' + String(meeting.getMonth() + 1).padStart(2, '0') + '-' + String(meeting.getDate()).padStart(2, '0');
+    for (const node of meetingTargets) {
+      node.setAttribute('datetime', iso);
+      node.textContent = label;
+    }
   }
 
   const ideaForm = document.getElementById('idea-form');
@@ -723,7 +736,9 @@
       hint.className = 'join-hint join-hint--status' + (kind ? ' is-' + kind : '');
     };
 
+    let ideasCache = [];
     const renderIdeas = (ideas) => {
+      ideasCache = ideas;
       list.innerHTML = '';
       empty.hidden = ideas.length > 0;
       for (const idea of ideas) {
@@ -795,7 +810,14 @@
       if (!ok) { setHint((data && data.error) || 'Could not post the idea.', 'error'); return; }
       text.value = '';
       setHint('Posted — your idea is on the board.', 'ok');
-      loadIdeas();
+      // The write is visible to this browser immediately; the shared list
+      // catches up once the edge cache refreshes.
+      if (data && data.idea) {
+        const others = ideasCache.filter((item) => item.id !== data.idea.id);
+        renderIdeas([data.idea, ...others]);
+      } else {
+        loadIdeas();
+      }
     });
   }
 })();
