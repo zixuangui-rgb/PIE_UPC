@@ -121,7 +121,7 @@
       : `Matches: ${escapeHtml(entry._hits ? entry._hits.join(', ') : '')}${detail ? ' · ' + escapeHtml(detail) : ''}`;
     return (
       `<article class="finder-card">
-        <figure class="finder-photo"><img src="./assets/${entry.img}" alt="" width="320" height="240" loading="lazy" decoding="async" /></figure>
+        <figure class="finder-photo"><img src="${/^https?:/.test(entry.img) ? entry.img : './assets/' + entry.img}" alt="" width="320" height="240" loading="lazy" decoding="async" /></figure>
         <div class="finder-body">
           <p class="finder-type">${type.label}</p>
           <h3>${escapeHtml(entry.name)}${badge}</h3>
@@ -412,6 +412,30 @@
         ${contact}
       </article>`
     );
+  }
+
+  // Experiences published by members join the recommendation pool too, so the AI
+  // can suggest them and the offline preview can render them.
+  if (typeof POOL !== 'undefined' && POOL.stories) {
+    apiFetch('/stories').then(({ ok, data }) => {
+      if (!ok || !data) return;
+      for (const story of data.stories || []) {
+        if (POOL.stories.some((item) => item.id === story.id)) continue;
+        const author = story.author || {};
+        const words = String((story.quote || '') + ' ' + (story.place || '')).toLowerCase()
+          .replace(/[^a-z0-9\s]/g, ' ').split(/\s+/)
+          .filter((word) => word.length > 4);
+        POOL.stories.push({
+          id: story.id,
+          name: author.name || 'PIE member',
+          img: /^https?:/.test(author.photo || '') ? author.photo : String(author.photo || '').replace(/^\.\/assets\//, ''),
+          sub: story.place || 'A member experience',
+          langs: [],
+          kw: [...new Set(words)].slice(0, 12),
+          badge: 'Member'
+        });
+      }
+    });
   }
 
   // Members page: apply registered edits to existing cards and append new members.
