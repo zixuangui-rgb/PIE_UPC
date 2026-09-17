@@ -6,7 +6,8 @@ The homepage keeps the original Paris hero, adds a **Find your PIE** preview and
 
 ## Content and interaction
 
-- Members: twenty-eight profiles, including six supplied real team profiles: Sparlay Khan, Zixuan Gui, Tamara Matijević, Alessio SATURNINO, Amir M. Cheraghali and Meghna Varma. Each card carries a five-star activity indicator under the status badge (illustrative: 4–5 stars for the active real team, randomized example ratings for demo profiles). All six retain their supplied clickable email contacts. Tamara's profile lists Serbia, English/French/Serbian, neuroscience and molecular biology. Alessio's profile lists Italy, Italian/English/French/Spanish, molecular biology, cancer epigenetics and his supplied sports, nature, poetry and music interests. Tamara and Alessio use the general Community member label and Active status. Twenty-two fictional profiles are marked Demo, with AI-generated portraits and Active/Alumni example status. Several countries recur at different frequencies, with varied interests and roles within each group; this is an illustrative community, not PIE demographic data. Example emails use `example.com` and are display-only placeholders.
+- Members: twenty-eight profiles, including six supplied real team profiles: Sparlay Khan, Zixuan Gui, Tamara Matijević, Alessio SATURNINO, Amir M. Cheraghali and Meghna Varma. Each card carries a five-star activity indicator under the status badge (illustrative: 4–5 stars for the active real team, randomized example ratings for demo profiles). All six retain their supplied clickable email contacts.
+- Registration: `join.html` lets a visitor verify an email address with a 6-digit code, claim one of the six supplied profiles if the address matches, or add a new profile to the directory. New members appear with a **Member** badge, can upload a portrait, choose whether their email is public, and edit or delete their entry later. Data is stored in Cloudflare KV through the same Worker; the directory still renders without JavaScript. Verification codes are shown on the page until a mail key is configured — see [registration notes](docs/registration.md). Tamara's profile lists Serbia, English/French/Serbian, neuroscience and molecular biology. Alessio's profile lists Italy, Italian/English/French/Spanish, molecular biology, cancer epigenetics and his supplied sports, nature, poetry and music interests. Tamara and Alessio use the general Community member label and Active status. Twenty-two fictional profiles are marked Demo, with AI-generated portraits and Active/Alumni example status. Several countries recur at different frequencies, with varied interests and roles within each group; this is an illustrative community, not PIE demographic data. Example emails use `example.com` and are display-only placeholders.
 - Events: twelve fictional activities from September through November 2026. The original six are retained, followed by study time, a photo walk, a second language café, a park run or walk, a small-item swap and a community check-in. Familiar recurring activities sit alongside occasional outings. Each has its own image, date, time, setting and practical participation details. The date sits in a small frosted-glass badge over each photo; phones place the media above the text.
 - Experiences: twelve fictional first-person stories, with the original six retained. Additional topics include photography, finding a place in multilingual conversations, studying together, quiet weekends, volunteer handovers and making affordable plans. Each author has a corresponding fictional member profile. Wide article rows pair photos with titles, bylines and summaries, plus native expand/collapse controls. Phones show the photo as the top of the same story card.
 - Each activity and story has its own image; no image is shared between the Events and Experiences pages.
@@ -30,6 +31,7 @@ Open `http://localhost:8000/`.
 | --- | --- |
 | `index.html` | Homepage content and metadata |
 | `members.html`, `events.html`, `experiences.html` | Community destination pages |
+| `join.html` | Registration and profile editing page |
 | `style.css` | Original hero typography and responsive layout |
 | `community.css` | Community sections, destination pages and interaction styles |
 | `main.js` | Progressive scroll reveal for the homepage gateways and the Find your PIE preview matching |
@@ -42,6 +44,8 @@ Open `http://localhost:8000/`.
 | `docs/doubled-*-image-prompts.md` | Prompts and provenance for the second content expansion |
 | `docs/demo-content-guidelines.md` | Plausibility and consistency rules for demo profiles, events and stories |
 | `docs/real-photo-sources.md` | Sources and conversion notes for the real photos replacing some demo images |
+| `docs/registration.md` | Registration service: endpoints, rules, limits and how to enable email delivery |
+| `worker/` | Cloudflare Worker: AI recommendations plus the registration and profile service |
 | `scripts/version_assets.py` | Adds content-based CSS/JS version URLs to staged pages |
 | `.github/workflows/pages.yml` | Automatic GitHub Pages deployment |
 

@@ -271,3 +271,46 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
   .finder-grid { grid-template-columns: minmax(0, 1fr); }
   .finder-card h3 { font-size: 24px; }
 }
+
+/* Registered members and the join page. */
+.member-status--member { background: var(--stories-paper); color: #2f5a48; }
+.member-portrait--initials { display: grid; place-items: center; background: var(--members-paper); color: var(--blue); font: 400 26px var(--serif); }
+.member-portrait--member img { transform: none; }
+.join { padding: 8px 0 96px; display: grid; gap: 26px; max-width: 940px; }
+.join-step { padding: clamp(22px, 2.4vw, 34px); background: #fff; border: 1px solid var(--line); }
+.join-step[hidden] { display: none; }
+.join-step-number { margin: 0 0 10px; color: var(--blue); font-size: 11px; font-weight: 600; letter-spacing: .12em; }
+.join-step h2 { margin: 0 0 12px; font: 400 clamp(26px, 2.4vw, 34px)/1.15 var(--serif); letter-spacing: -.01em; }
+.join-hint { margin: 0 0 14px; color: var(--secondary); font-size: 12.5px; line-height: 1.7; }
+.join-hint--status { margin: 14px 0 0; }
+.join-hint--status.is-ok { color: #2f5a48; }
+.join-hint--status.is-error { color: #a3342f; }
+.join-row { display: flex; gap: 12px; align-items: stretch; }
+.join-row input { flex: 1; min-width: 0; padding: 12px 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 2px; color: var(--ink); font: 400 15px/1.6 var(--sans); }
+.join-row input:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; border-color: var(--blue); }
+.join-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 26px; margin-top: 4px; }
+.join-field { min-width: 0; }
+.join-field--wide { grid-column: 1 / -1; }
+.join-field label { display: block; margin: 0 0 8px; font-size: 12px; font-weight: 600; }
+.join-optional { color: var(--secondary); font-weight: 400; }
+.join-field input, .join-field textarea { width: 100%; padding: 12px 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 2px; color: var(--ink); font: 400 14px/1.6 var(--sans); resize: vertical; }
+.join-field input:focus-visible, .join-field textarea:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; border-color: var(--blue); }
+.join-photo-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.join-photo-row img { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; background: var(--members-paper); }
+.join-photo-row img[hidden] { display: none; }
+.join-photo-row input[type="file"] { flex: 1; min-width: 200px; padding: 10px 12px; background: var(--paper); border: 1px dashed var(--line); border-radius: 2px; font: 400 13px var(--sans); }
+.join-check { display: flex; align-items: center; gap: 10px; margin: 22px 0 0; font-size: 13px; color: var(--secondary); }
+.join-actions { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line); }
+.join-link { background: none; border: 0; padding: 0; color: var(--secondary); font: 500 13px var(--sans); text-decoration: none; cursor: pointer; }
+.join-link:hover { color: var(--blue); }
+.join-link--danger:hover { color: #a3342f; }
+.join-cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; color: var(--blue); font-size: 13px; font-weight: 500; text-decoration: none; }
+.join-cta:hover { text-decoration: underline; }
+
+@media (max-width: 720px) {
+  .join { padding-bottom: 60px; }
+  .join-grid { grid-template-columns: minmax(0, 1fr); }
+  .join-row { flex-wrap: wrap; }
+  .join-row input { flex-basis: 100%; }
+  .join-row .finder-submit { flex: 1; }
+}

@@ -103,30 +103,48 @@ export const CATALOG_IDS = {
 
 const MAX_INPUT_CHARS = 600;
 
+// Registered members (stored in KV) are appended to the catalog so the model can
+// recommend them too. They carry no country/languages unless the member typed them.
+export function buildDynamicLines(members) {
+  if (!members || !members.length) return '';
+  return members.map((m) => {
+    const role = [m.role, m.country].filter(Boolean).join(', ') || 'Community member';
+    const tags = (m.tags || []).join(', ');
+    return `- ${m.id} | ${m.name} | ${role} | — | ${tags} | member`;
+  }).join('\n');
+}
+
 function cleanPick(pick, allowed) {
   if (!pick || typeof pick.id !== 'string' || !allowed.has(pick.id)) return null;
   const reason = typeof pick.reason === 'string' ? pick.reason.trim().slice(0, 220) : '';
   return { id: pick.id, reason };
 }
 
-function validate(parsed) {
+function validate(parsed, allowedMembers) {
   const str = (v) => (typeof v === 'string' ? v.trim().slice(0, 220) : '');
   return {
     mode: 'ai',
     language: str(parsed.language),
     summary: str(parsed.summary),
     note: str(parsed.note),
-    member: cleanPick(parsed.member, CATALOG_IDS.member),
+    member: cleanPick(parsed.member, allowedMembers || CATALOG_IDS.member),
     event: cleanPick(parsed.event, CATALOG_IDS.event),
     story: cleanPick(parsed.story, CATALOG_IDS.story)
   };
 }
 
-export async function recommend(input, apiKey) {
+export async function recommend(input, apiKey, extras = []) {
   const text = String(input || '').trim().slice(0, MAX_INPUT_CHARS);
   if (!text) throw new Error('empty input');
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date());
-  const system = SYSTEM_PROMPT.replace('{CURRENT_DATE}', today);
+  const dynamicLines = buildDynamicLines(extras);
+  let system = SYSTEM_PROMPT.replace('{CURRENT_DATE}', today);
+  if (dynamicLines) {
+    system = system.replace('\n\nEVENTS — id |', `\n${dynamicLines}\n\nEVENTS — id |`);
+  }
+  const allowedMembers = dynamicLines
+    ? new Set([...CATALOG_IDS.member, ...extras.map((m) => m.id)])
+    : CATALOG_IDS.member;
 
   const resp = await fetch('https://api.deepseek.com/chat/completions', {
     method: 'POST',
@@ -148,55 +166,5 @@ export async function recommend(input, apiKey) {
   const data = await resp.json();
   const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
   if (!content) throw new Error('empty completion');
-  return validate(JSON.parse(content));
+  return validate(JSON.parse(content), allowedMembers);
 }
-
-// ---- Cloudflare Worker entry -------------------------------------------------
-// Best-effort per-isolate rate limit: 12 requests per minute per IP.
-const hits = new Map();
-const LIMIT = 12;
-const WINDOW_MS = 60000;
-
-function rateLimited(ip) {
-  const now = Date.now();
-  const list = (hits.get(ip) || []).filter((t) => now - t < WINDOW_MS);
-  if (list.length >= LIMIT) { hits.set(ip, list); return true; }
-  list.push(now);
-  hits.set(ip, list);
-  return false;
-}
-
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Max-Age': '86400'
-};
-
-export default {
-  async fetch(request, env) {
-    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
-    const url = new URL(request.url);
-    if (url.pathname !== '/recommend' || request.method !== 'POST') {
-      return new Response(JSON.stringify({ error: 'not found' }), { status: 404, headers: { ...CORS, 'Content-Type': 'application/json' } });
-    }
-    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-    if (rateLimited(ip)) {
-      return new Response(JSON.stringify({ error: 'rate limited' }), { status: 429, headers: { ...CORS, 'Content-Type': 'application/json' } });
-    }
-    let input = '';
-    try {
-      const body = await request.json();
-      input = String(body.input || '').trim().slice(0, MAX_INPUT_CHARS);
-    } catch (err) { input = ''; }
-    if (!input) {
-      return new Response(JSON.stringify({ error: 'input required' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } });
-    }
-    try {
-      const result = await recommend(input, env.DEEPSEEK_API_KEY);
-      return new Response(JSON.stringify(result), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
-    } catch (err) {
-      return new Response(JSON.stringify({ error: 'recommendation failed' }), { status: 502, headers: { ...CORS, 'Content-Type': 'application/json' } });
-    }
-  }
-};

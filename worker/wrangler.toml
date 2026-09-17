@@ -1,3 +1,7 @@
 name = "pie-recommend"
-main = "recommend.js"
+main = "index.js"
 compatibility_date = "2026-09-01"
+
+[[kv_namespaces]]
+binding = "PIE_KV"
+id = "15c7b7ec698241599436c867928c837d"

@@ -7,7 +7,7 @@ from pathlib import Path
 
 def version_assets(site: Path) -> None:
     assets = ("style.css", "community.css", "main.js")
-    pages = ("index.html", "members.html", "events.html", "experiences.html")
+    pages = ("index.html", "members.html", "events.html", "experiences.html", "join.html")
     versions = {
         name: hashlib.sha256((site / name).read_bytes()).hexdigest()[:16]
         for name in assets

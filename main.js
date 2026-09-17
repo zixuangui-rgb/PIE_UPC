@@ -35,7 +35,7 @@
   const modeBadge = document.getElementById('finder-mode');
   const noteEl = document.getElementById('finder-results-note');
   const summaryEl = document.getElementById('finder-results-summary');
-  if (!form || !input || !results || !grid || !noteEl) return;
+  const finderReady = !!(form && input && results && grid && noteEl);
 
   // Production endpoint first; the local dev proxy is the fallback for development.
   const AI_ENDPOINTS = [
@@ -289,28 +289,342 @@
     if (!data || !renderAi(data)) renderPreview();
   }
 
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    run();
-  });
-
-  input.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
+  if (finderReady) {
+    form.addEventListener('submit', (event) => {
       event.preventDefault();
       run();
-    }
-  });
-
-  input.addEventListener('input', () => {
-    input.style.height = 'auto';
-    input.style.height = Math.min(input.scrollHeight, 138) + 'px';
-  });
-
-  for (const chip of document.querySelectorAll('.finder-example')) {
-    chip.addEventListener('click', () => {
-      input.value = chip.textContent.trim();
-      input.dispatchEvent(new Event('input'));
-      input.focus();
     });
+
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        run();
+      }
+    });
+
+    input.addEventListener('input', () => {
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 138) + 'px';
+    });
+
+    for (const chip of document.querySelectorAll('.finder-example')) {
+      chip.addEventListener('click', () => {
+        input.value = chip.textContent.trim();
+        input.dispatchEvent(new Event('input'));
+        input.focus();
+      });
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Account service: join page (register / claim / edit) and directory sync.
+  // ---------------------------------------------------------------------------
+  const ACCOUNT_API = 'https://pie-recommend.zixuangui.workers.dev';
+  const TOKEN_KEY = 'pie-token';
+
+  const apiFetch = async (path, options = {}) => {
+    try {
+      const resp = await fetch(ACCOUNT_API + path, {
+        ...options,
+        headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+        signal: AbortSignal.timeout(20000)
+      });
+      let data = null;
+      try { data = await resp.json(); } catch (err) { data = null; }
+      return { ok: resp.ok, status: resp.status, data };
+    } catch (err) {
+      return { ok: false, status: 0, data: null };
+    }
+  };
+
+  const photoUrl = (value) => (value && value.startsWith('/photo/') ? ACCOUNT_API + value : value);
+  const initials = (name) => String(name || '?').split(/\s+/).slice(0, 2).map((part) => part.charAt(0).toUpperCase()).join('');
+
+  // One shared request for the registered profiles, reused by the pool merge
+  // and the directory merge.
+  let profilesPending = null;
+  const profilesOnce = () => {
+    if (!profilesPending) profilesPending = apiFetch('/profiles');
+    return profilesPending;
+  };
+
+  // Registered members join the recommendation pool so the AI can suggest them
+  // and the offline keyword preview can render their cards.
+  if (typeof POOL !== 'undefined' && POOL.members) {
+    profilesOnce().then(({ ok, data }) => {
+      if (!ok || !data) return;
+      for (const record of data.dynamic || []) {
+        if (POOL.members.some((member) => member.id === record.id)) continue;
+        POOL.members.push({
+          id: record.id,
+          name: record.name,
+          img: photoUrl(record.photo) || '',
+          sub: [record.role, record.country].filter(Boolean).join(' · ') || 'Community member',
+          langs: [],
+          kw: (record.tags || []).map((tag) => String(tag).toLowerCase()),
+          badge: 'Member'
+        });
+      }
+    });
+  }
+
+  function dynamicCard(record) {
+    const role = [record.role, record.country].filter(Boolean).join(' · ') || 'Community member';
+    const tags = (record.tags || []).map((tag) => `<li>${escapeHtml(tag)}</li>`).join('');
+    const photo = record.photo
+      ? `<div class="member-portrait member-portrait--photo member-portrait--member"><img src="${escapeHtml(photoUrl(record.photo))}" alt="Portrait of ${escapeHtml(record.name)}" width="480" height="480" loading="lazy" decoding="async" /></div>`
+      : `<span class="member-portrait member-portrait--initials" aria-hidden="true">${escapeHtml(initials(record.name))}</span>`;
+    const contact = record.email
+      ? `<dl class="member-contact"><dt>Email</dt><dd><a href="mailto:${escapeHtml(record.email)}">${escapeHtml(record.email)}</a></dd></dl>`
+      : '';
+    const summary = record.summary ? `<p class="card-summary">${escapeHtml(record.summary)}</p>` : '';
+    return (
+      `<article class="member-card" id="${escapeHtml(record.id)}">
+        <div class="member-card-header">${photo}
+          <div class="member-identity">
+            <h2>${escapeHtml(record.name)}</h2>
+            <p class="member-role">${escapeHtml(role)}</p>
+            <span class="member-status member-status--member">Member</span>
+          </div>
+        </div>
+        ${summary}
+        ${tags ? `<ul class="tag-list" aria-label="Interests">${tags}</ul>` : ''}
+        ${contact}
+      </article>`
+    );
+  }
+
+  // Members page: apply registered edits to existing cards and append new members.
+  const memberGrid = document.getElementById('member-grid');
+  if (memberGrid) {
+    profilesOnce().then(({ ok, data }) => {
+      if (!ok || !data) return;
+      for (const [id, patch] of Object.entries(data.patched || {})) {
+        const card = document.getElementById(id);
+        if (!card) continue;
+        const setText = (selector, value) => {
+          const el = card.querySelector(selector);
+          if (el && value) el.textContent = value;
+        };
+        setText('h2', patch.name);
+        const role = [patch.role, patch.country].filter(Boolean).join(' · ');
+        setText('.member-role', role);
+        setText('.card-summary', patch.summary);
+        if (patch.tags && patch.tags.length) {
+          const list = card.querySelector('.tag-list');
+          if (list) {
+            list.innerHTML = '';
+            for (const tag of patch.tags) {
+              const li = document.createElement('li');
+              li.textContent = tag;
+              list.appendChild(li);
+            }
+          }
+        }
+        if (patch.email) {
+          const dd = card.querySelector('.member-contact dd');
+          if (dd) {
+            dd.innerHTML = '';
+            const link = document.createElement('a');
+            link.href = 'mailto:' + patch.email;
+            link.textContent = patch.email;
+            dd.appendChild(link);
+          }
+        }
+        if (patch.photo) {
+          const img = card.querySelector('.member-portrait img');
+          if (img) img.src = photoUrl(patch.photo);
+        }
+      }
+      for (const record of data.dynamic || []) memberGrid.insertAdjacentHTML('beforeend', dynamicCard(record));
+    });
+  }
+
+  // Join page: email code, verification, profile editing.
+  const joinForm = document.getElementById('join-step-profile');
+  if (joinForm) {
+    const el = (id) => document.getElementById(id);
+    const ui = {
+      emailStep: el('join-step-email'), email: el('join-email'), send: el('join-send'), emailHint: el('join-email-hint'),
+      codeStep: el('join-step-code'), code: el('join-code'), verify: el('join-verify'),
+      codeHint: el('join-code-hint'), verifyHint: el('join-verify-hint'),
+      profileHint: el('join-profile-hint'), name: el('join-name'), role: el('join-role'), country: el('join-country'),
+      tags: el('join-tags'), summary: el('join-summary'), photo: el('join-photo'), preview: el('join-photo-preview'),
+      emailPublic: el('join-email-public'), save: el('join-save'), saveHint: el('join-save-hint'),
+      signout: el('join-signout'), del: el('join-delete')
+    };
+    let token = localStorage.getItem(TOKEN_KEY) || '';
+    let photoData = '';
+
+    const status = (node, text, kind) => {
+      if (!node) return;
+      node.textContent = text || '';
+      node.className = 'join-hint join-hint--status' + (kind ? ' is-' + kind : '');
+    };
+
+    const fillForm = (profile) => {
+      if (!profile) return;
+      ui.name.value = profile.name || '';
+      ui.role.value = profile.role || '';
+      ui.country.value = profile.country || '';
+      ui.tags.value = (profile.tags || []).join(', ');
+      ui.summary.value = profile.summary || '';
+      ui.emailPublic.checked = !!profile.email;
+      ui.del.hidden = !profile.dynamic;
+      if (profile.photo) {
+        ui.preview.src = photoUrl(profile.photo);
+        ui.preview.hidden = false;
+      }
+    };
+
+    const showProfileStep = () => {
+      ui.codeStep.hidden = true;
+      joinForm.hidden = false;
+    };
+
+    ui.send.addEventListener('click', async () => {
+      const email = ui.email.value.trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        status(ui.emailHint, 'Please enter a valid email address.', 'error');
+        return;
+      }
+      ui.send.disabled = true;
+      status(ui.emailHint, 'Sending the code…');
+      const { ok, data } = await apiFetch('/auth/code', { method: 'POST', body: JSON.stringify({ email }) });
+      ui.send.disabled = false;
+      if (!ok) {
+        status(ui.emailHint, (data && data.error) || 'Could not send the code. Please try again.', 'error');
+        return;
+      }
+      ui.codeStep.hidden = false;
+      if (data.devCode) {
+        status(ui.emailHint, `Demo mode — your code is ${data.devCode}`, 'ok');
+        ui.code.value = data.devCode;
+      } else {
+        status(ui.emailHint, 'Code sent. Please check your inbox.', 'ok');
+      }
+      if (data.knownProfile) {
+        status(ui.codeHint, `We found an existing profile for this address: ${data.knownProfile.name}.`, 'ok');
+      } else {
+        status(ui.codeHint, 'Enter the six-digit code to continue.');
+      }
+      ui.code.focus();
+    });
+
+    ui.verify.addEventListener('click', async () => {
+      const email = ui.email.value.trim().toLowerCase();
+      const code = ui.code.value.trim();
+      if (code.length < 6) {
+        status(ui.verifyHint, 'Please enter the six-digit code.', 'error');
+        return;
+      }
+      ui.verify.disabled = true;
+      status(ui.verifyHint, 'Checking the code…');
+      const { ok, data } = await apiFetch('/auth/verify', { method: 'POST', body: JSON.stringify({ email, code }) });
+      ui.verify.disabled = false;
+      if (!ok) {
+        status(ui.verifyHint, (data && data.error) || 'Verification failed.', 'error');
+        return;
+      }
+      token = data.token;
+      localStorage.setItem(TOKEN_KEY, token);
+      status(ui.verifyHint, 'Verified.', 'ok');
+      fillForm(data.profile);
+      ui.profileHint.textContent = data.isExisting
+        ? `Signed in as ${email}. This address is linked to the existing profile “${data.profile ? data.profile.name : ''}” — saving updates that card.`
+        : `Signed in as ${email}. Saving adds a new profile to the member directory.`;
+      showProfileStep();
+      joinForm.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    });
+
+    ui.photo.addEventListener('change', () => {
+      const file = ui.photo.files && ui.photo.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const image = new Image();
+        image.onload = () => {
+          const size = 400;
+          const min = Math.min(image.width, image.height);
+          const canvas = document.createElement('canvas');
+          canvas.width = size;
+          canvas.height = size;
+          canvas.getContext('2d').drawImage(image, (image.width - min) / 2, (image.height - min) / 2, min, min, 0, 0, size, size);
+          photoData = canvas.toDataURL('image/jpeg', 0.82);
+          ui.preview.src = photoData;
+          ui.preview.hidden = false;
+        };
+        image.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    joinForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const payload = {
+        name: ui.name.value.trim(),
+        role: ui.role.value.trim(),
+        country: ui.country.value.trim(),
+        summary: ui.summary.value.trim(),
+        tags: ui.tags.value.split(',').map((tag) => tag.trim()).filter(Boolean).slice(0, 8),
+        emailPublic: ui.emailPublic.checked
+      };
+      if (photoData) payload.photo = photoData;
+      ui.save.disabled = true;
+      status(ui.saveHint, 'Saving…');
+      const { ok, data } = await apiFetch('/profile', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + token },
+        body: JSON.stringify(payload)
+      });
+      ui.save.disabled = false;
+      if (!ok) {
+        status(ui.saveHint, (data && data.error) || 'Could not save the profile.', 'error');
+        return;
+      }
+      status(ui.saveHint, 'Saved. Your profile is live in the member directory.', 'ok');
+      ui.del.hidden = !(data && data.profile && data.profile.dynamic);
+      photoData = '';
+    });
+
+    ui.signout.addEventListener('click', () => {
+      localStorage.removeItem(TOKEN_KEY);
+      token = '';
+      joinForm.hidden = true;
+      ui.codeStep.hidden = true;
+      ui.del.hidden = true;
+      status(ui.emailHint, 'Signed out.');
+      ui.emailStep.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    });
+
+    ui.del.addEventListener('click', async () => {
+      if (!window.confirm('Delete your profile from the directory? This cannot be undone.')) return;
+      const { ok } = await apiFetch('/profile', { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
+      if (!ok) {
+        status(ui.saveHint, 'Could not delete the profile.', 'error');
+        return;
+      }
+      localStorage.removeItem(TOKEN_KEY);
+      token = '';
+      joinForm.hidden = true;
+      status(ui.emailHint, 'Your profile was deleted.', 'ok');
+    });
+
+    // Resume an existing session so returning members land straight on the form.
+    if (token) {
+      apiFetch('/me', { headers: { Authorization: 'Bearer ' + token } }).then(({ ok, data }) => {
+        if (!ok || !data) {
+          token = '';
+          localStorage.removeItem(TOKEN_KEY);
+          return;
+        }
+        ui.email.value = data.email || '';
+        fillForm(data.profile);
+        ui.profileHint.textContent = data.profileId
+          ? `Signed in as ${data.email}. Saving updates your existing card.`
+          : `Signed in as ${data.email}. Saving adds a new profile to the directory.`;
+        showProfileStep();
+      });
+    }
   }
 })();
