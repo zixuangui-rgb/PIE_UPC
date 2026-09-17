@@ -900,8 +900,14 @@
       // The write is visible to this browser immediately; the shared list
       // catches up once the edge cache refreshes.
       if (saved) {
-        const others = ideasCache.filter((item) => item.id !== saved.id);
-        renderIdeas(wasEditing ? others.map((item) => item.id === saved.id ? saved : item).concat([]) : [saved, ...others]);
+        if (wasEditing) {
+          const known = ideasCache.some((item) => item.id === saved.id);
+          renderIdeas(known
+            ? ideasCache.map((item) => (item.id === saved.id ? saved : item))
+            : [saved, ...ideasCache]);
+        } else {
+          renderIdeas([saved, ...ideasCache.filter((item) => item.id !== saved.id)]);
+        }
       } else {
         loadIdeas();
       }
