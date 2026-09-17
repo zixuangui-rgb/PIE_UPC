@@ -27,18 +27,9 @@ MEMBERS — id | name | role, country | languages | interests | real/demo
 - meghna-varma | Meghna Varma | Community member | — | astrophysics, gender equality in STEM, science education and communication, music, dance, basketball, reading | real
 
 EVENTS — id | title | date time | category | languages | notes | all example
-- coffee-first-hellos | Coffee & first hellos | Thu 24 Sep 2026 17:30 | meet & connect | EN/FR | first-timers welcome, buy your own drink
-- sunday-seine-walk | A Sunday along the Seine | Sun 27 Sep 2026 14:00 | out in the city | EN/FR | free riverside walk
-- language-cafe | A seat at the language café | Fri 2 Oct 2026 18:00 | words & worlds | multilingual | all levels, free
-- board-game-evening | A board-game evening | Wed 7 Oct 2026 18:30 | play & connect | EN/FR | beginners welcome, games provided, free
-- neighbourhood-sketch-walk | A neighbourhood sketch walk | Sat 10 Oct 2026 11:00 | look & create | EN/FR | free, rain postpones
-- shared-student-dinner | A shared table on Sunday | Sun 18 Oct 2026 17:00 | food & conversation | EN/FR | bring your own meal
-- quiet-study-and-tea | A quiet hour, with a tea break | Thu 22 Oct 2026 18:00 | study & company | EN/FR | bring your own work, free
-- sunday-photo-walk | Paris in small details | Sun 25 Oct 2026 14:00 | out in the city | EN/FR | free photo walk, a phone is fine
-- language-cafe-everyday | Back at the language café | Fri 30 Oct 2026 18:30 | words & worlds | EN/FR | all levels, free
-- park-run-and-walk | A little fresh air, at your pace | Sat 7 Nov 2026 11:00 | move & unwind | EN/FR | walk or jog, free
-- books-and-small-item-swap | A new home for a good book | Wed 18 Nov 2026 18:00 | share & reuse | EN/FR | free swap
-- november-community-check-in | A November catch-up | Thu 26 Nov 2026 18:30 | meet & connect | EN/FR | newcomers welcome, free
+- monthly-meeting | Monthly meeting coming up! | every first Thursday of the month | team meeting | EN | CIUP, time to be announced | real notice from the PIE team
+- karaoke-night | Karaoke night! | Tue 22 Sep 2026 | music & friends | EN | time and place to be announced | real notice from the PIE team
+- pie-degustation | PIE Degustation!! | date to be announced | food & friends | EN | date and place to be announced | real notice from the PIE team
 
 STORIES — id | title | theme | author | all example
 - finding-my-first-familiar-faces | Finding my first familiar faces | settling in | Aya Tanaka
@@ -75,7 +66,7 @@ OUTPUT SCHEMA
 
 export const CATALOG_IDS = {
   member: new Set(['sparlay-khan', 'zixuan-gui', 'tamara-matijevic', 'alessio-saturnino', 'amir-cheraghali', 'meghna-varma']),
-  event: new Set(['coffee-first-hellos', 'sunday-seine-walk', 'language-cafe', 'board-game-evening', 'neighbourhood-sketch-walk', 'shared-student-dinner', 'quiet-study-and-tea', 'sunday-photo-walk', 'language-cafe-everyday', 'park-run-and-walk', 'books-and-small-item-swap', 'november-community-check-in']),
+  event: new Set(['monthly-meeting', 'karaoke-night', 'pie-degustation']),
   story: new Set(['finding-my-first-familiar-faces', 'paris-one-small-routine', 'the-afternoon-i-said-yes', 'a-small-plan-for-a-shared-kitchen', 'joining-a-game-without-knowing-the-rules', 'leaving-paris-keeping-in-touch', 'putting-the-camera-down', 'asking-people-to-slow-down', 'a-study-session-one-small-question', 'making-room-for-a-quiet-weekend', 'a-handover-that-fit-on-one-page', 'making-a-plan-people-could-actually-join'])
 };
 

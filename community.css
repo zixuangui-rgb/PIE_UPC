@@ -333,3 +333,39 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
   .join-row input { flex-basis: 100%; }
   .join-row .finder-submit { flex: 1; }
 }
+
+/* Real event announcements and community ideas. */
+.event-badge { position: absolute; bottom: 14px; left: 14px; z-index: 1; max-width: 78%; margin: 0; padding: 8px 12px; background: var(--paper); border-radius: 3px; color: var(--blue); font-size: 10px; font-weight: 600; letter-spacing: .09em; line-height: 1.5; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .7), 0 2px 12px rgb(21 29 50 / .08); }
+@supports ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+  .event-badge { background: rgb(248 250 255 / .75); -webkit-backdrop-filter: blur(10px) saturate(1.15); backdrop-filter: blur(10px) saturate(1.15); }
+}
+.ideas { padding: 8px 0 88px; border-top: 1px solid var(--line); }
+.ideas-heading { max-width: 720px; margin-bottom: 26px; }
+.ideas h2 { margin: 0 0 12px; font: 400 clamp(30px, 3vw, 44px)/1.1 var(--serif); letter-spacing: -.015em; }
+.ideas-lead { margin: 0; color: var(--secondary); font-size: 14px; line-height: 1.7; }
+.ideas-list { display: grid; gap: 12px; margin-bottom: 26px; }
+.idea-card { padding: 18px 22px; background: #fff; border: 1px solid var(--line); }
+.idea-card p { margin: 0 0 8px; font-size: 15px; line-height: 1.7; }
+.idea-meta { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 0; color: var(--secondary); font-size: 11px; }
+.idea-meta a { color: var(--blue); text-decoration: none; }
+.idea-meta a:hover { text-decoration: underline; }
+.idea-delete { margin-left: auto; padding: 0; background: none; border: 0; color: var(--secondary); font: 500 11px var(--sans); cursor: pointer; }
+.idea-delete:hover { color: #a3342f; }
+.ideas-empty { margin: 0 0 26px; color: var(--secondary); font-size: 13px; }
+.ideas-empty[hidden] { display: none; }
+.idea-form { max-width: 720px; padding: clamp(20px, 2.2vw, 28px); background: #fff; border: 1px solid var(--line); }
+.idea-form[hidden] { display: none; }
+.idea-form label { display: block; margin: 0 0 8px; font-size: 12px; font-weight: 600; }
+.idea-form textarea, .idea-form input { width: 100%; padding: 12px 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 2px; color: var(--ink); font: 400 14px/1.6 var(--sans); resize: vertical; }
+.idea-form textarea:focus-visible, .idea-form input:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; border-color: var(--blue); }
+.idea-form-row { margin-top: 16px; }
+.idea-form-actions { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 20px; }
+.idea-form-actions .join-hint { margin: 0; }
+.ideas-signin { margin: 0; color: var(--secondary); font-size: 13px; line-height: 1.7; }
+.ideas-signin[hidden] { display: none; }
+.ideas-signin a { color: var(--blue); }
+
+@media (max-width: 720px) {
+  .event-badge { bottom: 8px; left: 8px; padding: 6px 9px; font-size: 9px; }
+  .ideas { padding-bottom: 60px; }
+}

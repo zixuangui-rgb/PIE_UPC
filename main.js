@@ -54,18 +54,9 @@
       { id: 'meghna-varma', name: 'Meghna Varma', img: 'member-meghna-varma.jpeg', sub: 'Community member', langs: [], kw: ['astrophysics', 'physics', 'space', 'stem', 'gender equality', 'science', 'science communication', 'reading', 'books', 'music', 'dance', 'basketball'], badge: '' },
     ],
     events: [
-      { id: 'coffee-first-hellos', name: 'Coffee & first hellos', img: 'event-coffee.webp', when: 'Thu 24 Sep · 17:30', langs: ['english', 'french'], kw: ['coffee', 'cafe', 'meeting people', 'first', 'introductions', 'new'], badge: 'Example' },
-      { id: 'sunday-seine-walk', name: 'A Sunday along the Seine', img: 'event-seine-walk.webp', when: 'Sun 27 Sep · 14:00', langs: ['english', 'french'], kw: ['walk', 'walking', 'seine', 'river', 'outdoors', 'photography'], badge: 'Example' },
-      { id: 'language-cafe', name: 'A seat at the language café', img: 'event-language-cafe.webp', when: 'Fri 2 Oct · 18:00', langs: ['english', 'french', 'multilingual'], kw: ['language', 'languages', 'french', 'practice', 'words'], badge: 'Example' },
-      { id: 'board-game-evening', name: 'A board-game evening', img: 'event-board-games.webp', when: 'Wed 7 Oct · 18:30', langs: ['english', 'french'], kw: ['board games', 'games', 'game'], badge: 'Example' },
-      { id: 'neighbourhood-sketch-walk', name: 'A neighbourhood sketch walk', img: 'event-sketch-walk.webp', when: 'Sat 10 Oct · 11:00', langs: ['english', 'french'], kw: ['sketch', 'sketching', 'draw', 'drawing', 'art', 'walk'], badge: 'Example' },
-      { id: 'shared-student-dinner', name: 'A shared table on Sunday', img: 'event-shared-table.webp', when: 'Sun 18 Oct · 17:00', langs: ['english', 'french'], kw: ['dinner', 'food', 'meal', 'meals', 'cooking', 'eat'], badge: 'Example' },
-      { id: 'quiet-study-and-tea', name: 'A quiet hour, with a tea break', img: 'event-study-tea.webp', when: 'Thu 22 Oct · 18:00', langs: ['english', 'french'], kw: ['study', 'studying', 'quiet', 'tea', 'exams'], badge: 'Example' },
-      { id: 'sunday-photo-walk', name: 'Paris in small details', img: 'event-photo-walk.webp', when: 'Sun 25 Oct · 14:00', langs: ['english', 'french'], kw: ['photography', 'photo', 'camera', 'walk', 'details'], badge: 'Example' },
-      { id: 'language-cafe-everyday', name: 'Back at the language café', img: 'event-language-cafe-everyday.webp', when: 'Fri 30 Oct · 18:30', langs: ['english', 'french'], kw: ['language', 'languages', 'practice', 'words', 'conversation'], badge: 'Example' },
-      { id: 'park-run-and-walk', name: 'A little fresh air, at your pace', img: 'event-park-run-walk.webp', when: 'Sat 7 Nov · 11:00', langs: ['english', 'french'], kw: ['running', 'run', 'walk', 'walking', 'park', 'fresh air', 'sport'], badge: 'Example' },
-      { id: 'books-and-small-item-swap', name: 'A new home for a good book', img: 'event-book-swap.webp', when: 'Wed 18 Nov · 18:00', langs: ['english', 'french'], kw: ['books', 'swap', 'reading', 'exchange'], badge: 'Example' },
-      { id: 'november-community-check-in', name: 'A November catch-up', img: 'event-community-check-in.webp', when: 'Thu 26 Nov · 18:30', langs: ['english', 'french'], kw: ['catch up', 'check in', 'newcomers', 'meeting people'], badge: 'Example' }
+      { id: 'monthly-meeting', name: 'Monthly meeting', img: 'event-monthly-meeting.webp', when: 'Every first Thursday · CIUP', langs: [], kw: ['meeting', 'monthly', 'team', 'ciup', 'members'], badge: '' },
+      { id: 'karaoke-night', name: 'Karaoke night!', img: 'event-karaoke-night.webp', when: 'Tue 22 Sep', langs: [], kw: ['karaoke', 'singing', 'music', 'party', 'sing'], badge: '' },
+      { id: 'pie-degustation', name: 'PIE Degustation!!', img: 'event-pie-degustation.webp', when: 'Date to be announced', langs: [], kw: ['pie', 'food', 'degustation', 'tasting', 'baking', 'eat'], badge: '' }
     ],
     stories: [
       { id: 'finding-my-first-familiar-faces', name: 'Finding my first familiar faces', img: 'story-familiar-faces.webp', sub: 'Aya Tanaka · Settling in', kw: ['friends', 'friendship', 'meeting people', 'new', 'shy', 'hello'], badge: 'Example' },
@@ -699,6 +690,112 @@
       showSignedIn(active.email, active.profileId
         ? 'Saving updates your existing card in the directory.'
         : 'Saving adds a new profile to the member directory.');
+    });
+  }
+  // ---------------------------------------------------------------------------
+  // Events page: next monthly meeting date and the community idea board.
+  // ---------------------------------------------------------------------------
+  const meetingTargets = ['next-meeting-date', 'preview-meeting-date']
+    .map((id) => document.getElementById(id))
+    .filter(Boolean);
+  for (const nextMeeting of meetingTargets) {
+    const target = new Date();
+    target.setDate(1);
+    target.setDate(1 + ((4 - target.getDay() + 7) % 7));   // first Thursday
+    if (target < new Date(new Date().toDateString())) target.setMonth(target.getMonth() + 1, 1 + ((4 - new Date(target.getFullYear(), target.getMonth(), 1).getDay() + 7) % 7));
+    nextMeeting.setAttribute('datetime', target.toISOString().slice(0, 10));
+    nextMeeting.textContent = target.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+
+  const ideaForm = document.getElementById('idea-form');
+  if (ideaForm) {
+    const list = document.getElementById('ideas-list');
+    const empty = document.getElementById('ideas-empty');
+    const signin = document.getElementById('ideas-signin');
+    const text = document.getElementById('idea-text');
+    const nameField = document.getElementById('idea-name');
+    const hint = document.getElementById('idea-hint');
+    const submit = document.getElementById('idea-submit');
+    let myProfileId = null;
+
+    const setHint = (message, kind) => {
+      hint.textContent = message || '';
+      hint.className = 'join-hint join-hint--status' + (kind ? ' is-' + kind : '');
+    };
+
+    const renderIdeas = (ideas) => {
+      list.innerHTML = '';
+      empty.hidden = ideas.length > 0;
+      for (const idea of ideas) {
+        const card = document.createElement('article');
+        card.className = 'idea-card';
+        const body = document.createElement('p');
+        body.textContent = idea.text;
+        const meta = document.createElement('p');
+        meta.className = 'idea-meta';
+        if (idea.authorId && idea.authorName) {
+          const link = document.createElement('a');
+          link.href = './members.html#' + idea.authorId;
+          link.textContent = idea.authorName;
+          meta.appendChild(link);
+        } else {
+          const anon = document.createElement('span');
+          anon.textContent = idea.authorName || 'Anonymous';
+          meta.appendChild(anon);
+        }
+        const when = document.createElement('span');
+        when.textContent = new Date(idea.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+        meta.appendChild(when);
+        if (myProfileId && idea.authorId === myProfileId) {
+          const del = document.createElement('button');
+          del.type = 'button';
+          del.className = 'idea-delete';
+          del.textContent = 'Delete';
+          del.addEventListener('click', async () => {
+            const { ok } = await apiFetch('/ideas/' + idea.id, { method: 'DELETE', headers: { Authorization: 'Bearer ' + session.token } });
+            if (ok) loadIdeas();
+          });
+          meta.appendChild(del);
+        }
+        card.append(body, meta);
+        list.appendChild(card);
+      }
+    };
+
+    const loadIdeas = async () => {
+      const { ok, data } = await apiFetch('/ideas');
+      renderIdeas(ok && data ? data.ideas || [] : []);
+    };
+
+    loadSession().then((active) => {
+      if (active) {
+        myProfileId = active.profileId || null;
+        ideaForm.hidden = false;
+        signin.hidden = true;
+        nameField.value = (active.profile && active.profile.name) || '';
+      } else {
+        ideaForm.hidden = true;
+        signin.hidden = false;
+      }
+      loadIdeas();
+    });
+
+    ideaForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const value = text.value.trim();
+      if (value.length < 4) { setHint('Please write a few more words.', 'error'); return; }
+      submit.disabled = true;
+      setHint('Posting…');
+      const { ok, data } = await apiFetch('/ideas', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + session.token },
+        body: JSON.stringify({ text: value, name: nameField.value.trim() })
+      });
+      submit.disabled = false;
+      if (!ok) { setHint((data && data.error) || 'Could not post the idea.', 'error'); return; }
+      text.value = '';
+      setHint('Posted — your idea is on the board.', 'ok');
+      loadIdeas();
     });
   }
 })();

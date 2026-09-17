@@ -6,7 +6,6 @@ Reviewed 2026-09-16 with an image-capable model. This page records which demo im
 
 | Page image | Source photo | Source page | Notes |
 | --- | --- | --- | --- |
-| Events — A board-game evening (`assets/event-board-games.webp`) | "How to host a game night" article hero, 1600 × 1200 | [gaminglib.com](https://www.gaminglib.com/blogs/news/how-to-host-game-night) | Four friends laughing over a card game in a game shop. Verified as a genuine match for the event. |
 | Experiences — Finding my first familiar faces (`assets/story-familiar-faces.webp`) | `images.jpeg`, 739 × 415, supplied by the team | team-supplied file | Students walking and talking on a campus path; matches the story line about recognising familiar faces on campus. |
 | Experiences — Paris, one small routine at a time (`assets/story-paris-routine.webp`) | Burst photo `paris-streets`, 1600 × 2400 | [burst.shopify.com](https://burst.shopify.com/photos/paris-streets) | A quiet Paris street with small shops and people walking — the everyday route the story describes. |
 | Experiences — A study session, one small question (`assets/story-study-question.webp`) | Burst photo `student-team-meeting-at-table`, 1600 × 1067 | [burst.shopify.com](https://burst.shopify.com/photos/student-team-meeting-at-table) | Students working through textbooks and notes together around one table. |
@@ -42,3 +41,15 @@ Kept in `~/AIRE_Study/tmp/real-photos/` (outside the repository) with `_sources.
 ## Rights note
 
 The gaminglib photo is a third-party editorial/marketing image. If the site keeps using it long-term, permission should be obtained from the source or the image replaced with the community's own photography. The Burst photos carry a free-use licence with no attribution requirement.
+
+## Event announcement photos (2026-09-17)
+
+The twelve demo events were replaced by three real announcements from the team. Their images come from [Burst](https://burst.shopify.com) (free for commercial and non-commercial use, no attribution required) and were converted to 800 × 533 WebP (centre crop to 3:2, Lanczos, quality 86, method 6):
+
+| Page image | Burst photo |
+| --- | --- |
+| Events — Monthly meeting (`assets/event-monthly-meeting.webp`) | `thoughtful-students-talk` |
+| Events — Karaoke night (`assets/event-karaoke-night.webp`) | `handheld-microphone` |
+| Events — PIE Degustation (`assets/event-pie-degustation.webp`) | `plated-and-sliced-apple-pie` |
+
+`assets/event-board-games.webp` (the gaminglib photo) is no longer used on any page; it is kept as a spare in case a game-night event is added later.

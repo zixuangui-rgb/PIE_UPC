@@ -23,6 +23,9 @@ const MAX_CODE_PER_IP_HOUR = 30;   // a whole campus network can share one publi
 const CODE_COOLDOWN_SECONDS = 60;   // minimum gap between two requests for one address
 const MAX_CODES_PER_DAY = 200;      // protects the mail provider's daily quota
 const MAX_PHOTO_CHARS = 400 * 1024;   // base64 data URL cap (~300 KB image)
+const IDEA_LIMIT = 200;               // characters per idea
+const MAX_IDEAS_PER_HOUR = 5;
+const MAX_IDEAS_PER_DAY = 20;
 const FIELD_LIMITS = { name: 60, role: 60, country: 40, summary: 320, tags: 8, tag: 30, email: 120 };
 
 const CORS = {
@@ -296,6 +299,59 @@ export async function handleAccount(request, env, url) {
     if (!record || !record.dynamic) return json({ error: 'directory profiles cannot be deleted here' }, 403);
     await env.PIE_KV.delete(key.profile(id));
     await env.PIE_KV.delete(key.email(session.email));
+    return json({ deleted: true });
+  }
+
+  // ---- event ideas: posted by verified members, shown immediately ----------
+  if (path === '/ideas' && request.method === 'GET') {
+    const listed = await env.PIE_KV.list({ prefix: 'idea:' });
+    const ideas = [];
+    for (const entry of listed.keys) {
+      const record = JSON.parse((await env.PIE_KV.get(entry.name)) || 'null');
+      if (record) ideas.push(record);
+    }
+    ideas.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    return json({ ideas: ideas.slice(0, 50) }, 200, { 'Cache-Control': 'no-store' });
+  }
+
+  if (path === '/ideas' && request.method === 'POST') {
+    const session = await sessionFrom(request, env);
+    if (!session) return json({ error: 'only verified members can post an idea' }, 401);
+    let body = {};
+    try { body = await request.json(); } catch { body = {}; }
+    const text = clean(body.text, IDEA_LIMIT);
+    if (text.length < 4) return json({ error: 'please write a few more words' }, 400);
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    if (!(await bump(env, `idea-hour:${session.email}`, MAX_IDEAS_PER_HOUR, 3600))) return json({ error: 'you have posted several ideas already, please try again later' }, 429);
+    if (!(await bump(env, `idea-day:${session.email}`, MAX_IDEAS_PER_DAY, 86400))) return json({ error: 'daily idea limit reached' }, 429);
+    await bump(env, `idea-ip:${ip}`, 20, 3600);
+
+    const profileId = await env.PIE_KV.get(key.email(session.email));
+    const own = profileId ? await loadProfile(env, profileId) : null;
+    const claimed = findClaimableByEmail(session.email);
+    const name = clean(body.name, 40) || (own && own.name) || (claimed && claimed.name) || '';
+    const record = {
+      id: 'i-' + randomToken().slice(0, 12),
+      text,
+      authorId: profileId || (claimed ? claimed.id : ''),
+      authorName: name,
+      createdAt: Date.now()
+    };
+    await env.PIE_KV.put(`idea:${record.id}`, JSON.stringify(record));
+    return json({ idea: record });
+  }
+
+  if (path.startsWith('/ideas/') && request.method === 'DELETE') {
+    const session = await sessionFrom(request, env);
+    if (!session) return json({ error: 'not signed in' }, 401);
+    const id = clean(path.slice('/ideas/'.length), 40);
+    const record = JSON.parse((await env.PIE_KV.get(`idea:${id}`)) || 'null');
+    if (!record) return json({ error: 'idea not found' }, 404);
+    const profileId = await env.PIE_KV.get(key.email(session.email));
+    const claimed = findClaimableByEmail(session.email);
+    const mine = (profileId && record.authorId === profileId) || (claimed && record.authorId === claimed.id);
+    if (!mine) return json({ error: 'you can only delete your own idea' }, 403);
+    await env.PIE_KV.delete(`idea:${id}`);
     return json({ deleted: true });
   }
 
