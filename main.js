@@ -582,7 +582,7 @@
         status(ui.saveHint, (data && data.error) || 'Could not save the profile.', 'error');
         return;
       }
-      status(ui.saveHint, 'Saved. Your profile is live in the member directory.', 'ok');
+      status(ui.saveHint, 'Saved. Your profile will appear in the member directory within a minute.', 'ok');
       ui.del.hidden = !(data && data.profile && data.profile.dynamic);
       photoData = '';
     });

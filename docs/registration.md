@@ -65,6 +65,7 @@ KV: 100,000 reads and 1,000 writes per day. Worker: 100,000 requests per day. Br
 
 ## Operating notes
 
+- Saved changes can take up to a minute to appear on the public pages: Cloudflare KV reads are cached briefly at the edge. The join page tells members this after saving.
 - Inspect stored profiles: `npx wrangler kv key list --binding PIE_KV --remote`
 - Remove a profile manually: `npx wrangler kv key delete --binding PIE_KV --remote "profile:<id>"` (also delete `email:<address>`)
 - The claimable base data lives in `worker/claimable.js` and mirrors the six real cards in `members.html`; update both together.
