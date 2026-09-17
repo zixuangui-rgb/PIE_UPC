@@ -25,28 +25,6 @@ MEMBERS — id | name | role, country | languages | interests | real/demo
 - alessio-saturnino | Alessio SATURNINO | Community member, Italy | IT/EN/FR/ES | running, gym, basketball, volleyball, techno, poetry, nature | real
 - amir-cheraghali | Amir M. Cheraghali | Community member | — | hiking, football, piano | real
 - meghna-varma | Meghna Varma | Community member | — | astrophysics, gender equality in STEM, science education and communication, music, dance, basketball, reading | real
-- lina-moreau | Lina Moreau | Welcome buddy, France | EN/FR | photography, city walks | demo
-- mateo-silva | Mateo Silva | Event volunteer, Brazil | EN/PT | music, meetups, cafés | demo
-- aya-tanaka | Aya Tanaka | Community member, Japan | EN/JA | art, galleries, coffee | demo
-- salma-nouri | Salma Nouri | Community member, Morocco | AR/FR | cooking, film | demo
-- elias-lind | Elias Lind | Event volunteer, Sweden | EN/SV | board games, outdoors | demo
-- priya-nair | Priya Nair | Alumni, India | EN/HI | books, student life | demo
-- jonas-weber | Jonas Weber | Welcome buddy, Germany | EN/DE | urban walks, board games | demo
-- giulia-rossi | Giulia Rossi | Volunteer, Italy | EN/IT | sketching, language exchange | demo
-- camila-torres | Camila Torres | Community member, Mexico | ES/EN | reading, cycling | demo
-- aminata-diop | Aminata Diop | Alumni, Senegal | FR/EN | peer support, student life | demo
-- chen-wei | Chen Wei | Community member, China | EN/ZH | photography, badminton | demo
-- louis-bernard | Louis Bernard | Event volunteer, France | FR/EN | cycling, music | demo
-- arjun-mehta | Arjun Mehta | Community member, India | EN/HI | data science, photography | demo
-- yuting-lin | Yuting Lin | Volunteer, China | EN/ZH | film, cooking | demo
-- youssef-el-amrani | Youssef El Amrani | Event volunteer, Morocco | AR/FR | football, film | demo
-- beatriz-costa | Beatriz Costa | Community member, Brazil | PT/EN | baking, swimming | demo
-- ines-laurent | Inès Laurent | Community member, France | FR/EN | reading, crafts | demo
-- kavya-rao | Kavya Rao | Volunteer, India | EN/TE | theatre, urban gardens | demo
-- hamza-ahmed | Hamza Ahmed | Community member, Pakistan | UR/EN | architecture, walking | demo
-- imane-benali | Imane Benali | Alumni, Morocco | AR/FR | design, student life | demo
-- thomas-petit | Thomas Petit | Welcome buddy, France | FR/EN | running, cooking | demo
-- hao-zhang | Hao Zhang | Alumni, China | EN/ZH | coding, hiking | demo
 
 EVENTS — id | title | date time | category | languages | notes | all example
 - coffee-first-hellos | Coffee & first hellos | Thu 24 Sep 2026 17:30 | meet & connect | EN/FR | first-timers welcome, buy your own drink
@@ -96,7 +74,7 @@ OUTPUT SCHEMA
 }`;
 
 export const CATALOG_IDS = {
-  member: new Set(['sparlay-khan', 'zixuan-gui', 'tamara-matijevic', 'alessio-saturnino', 'amir-cheraghali', 'meghna-varma', 'lina-moreau', 'mateo-silva', 'aya-tanaka', 'salma-nouri', 'elias-lind', 'priya-nair', 'jonas-weber', 'giulia-rossi', 'camila-torres', 'aminata-diop', 'chen-wei', 'louis-bernard', 'arjun-mehta', 'yuting-lin', 'youssef-el-amrani', 'beatriz-costa', 'ines-laurent', 'kavya-rao', 'hamza-ahmed', 'imane-benali', 'thomas-petit', 'hao-zhang']),
+  member: new Set(['sparlay-khan', 'zixuan-gui', 'tamara-matijevic', 'alessio-saturnino', 'amir-cheraghali', 'meghna-varma']),
   event: new Set(['coffee-first-hellos', 'sunday-seine-walk', 'language-cafe', 'board-game-evening', 'neighbourhood-sketch-walk', 'shared-student-dinner', 'quiet-study-and-tea', 'sunday-photo-walk', 'language-cafe-everyday', 'park-run-and-walk', 'books-and-small-item-swap', 'november-community-check-in']),
   story: new Set(['finding-my-first-familiar-faces', 'paris-one-small-routine', 'the-afternoon-i-said-yes', 'a-small-plan-for-a-shared-kitchen', 'joining-a-game-without-knowing-the-rules', 'leaving-paris-keeping-in-touch', 'putting-the-camera-down', 'asking-people-to-slow-down', 'a-study-session-one-small-question', 'making-room-for-a-quiet-weekend', 'a-handover-that-fit-on-one-page', 'making-a-plan-people-could-actually-join'])
 };

@@ -30,9 +30,9 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .preview-person { display: flex; align-items: center; gap: 12px; padding: 16px 0; }
 .preview-person + .preview-person { border-top: 1px solid #d3dcec; }
 .preview-avatar { flex: none; width: 43px; height: 43px; display: grid; place-items: center; border-radius: 50%; font: 400 21px var(--serif); }
-.avatar--lina { background: #d3daf0; color: #263981; }
-.avatar--mateo { background: #ddd8ce; color: #615541; }
-.avatar--aya { background: #d1e1dc; color: #355d50; }
+.avatar--sparlay { background: #d3daf0; color: #263981; }
+.avatar--zixuan { background: #d1e1dc; color: #355d50; }
+.avatar--tamara { background: #ddd8ce; color: #615541; }
 .preview-person strong { display: block; font-size: 13px; font-weight: 600; line-height: 1.5; }
 .preview-person div > span { display: block; font-size: 11px; line-height: 1.6; color: var(--secondary); }
 .event-preview { justify-content: space-between; background: var(--events-paper); }
