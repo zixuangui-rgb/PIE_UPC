@@ -383,13 +383,14 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .post-main { min-width: 0; }
 .post-side { min-width: 0; }
 .post-main > label, .post-form .join-field label { display: block; margin: 0 0 9px; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--secondary); }
+.post-form label .join-optional { text-transform: none; letter-spacing: 0; font-weight: 400; }
 .post-form textarea, .post-form input:not([type="checkbox"]) { width: 100%; padding: 13px 15px; background: var(--paper); border: 1px solid var(--line); border-radius: 2px; color: var(--ink); font: 400 14px/1.7 var(--sans); resize: vertical; }
 .post-form textarea:focus-visible, .post-form input:not([type="checkbox"]):focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; border-color: var(--blue); }
 .post-form ::placeholder { color: #9aa3b8; }
 .post-details { grid-column: 1 / -1; margin: 22px 0 0; border-top: 1px solid var(--line); }
 .post-details summary { padding: 15px 0 2px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--blue); }
 .post-details[open] summary { padding-bottom: 16px; }
-.post-details-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 22px; }
+.post-details-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 22px; }
 .post-details .join-check { display: flex; align-items: center; gap: 10px; margin: 18px 0 0; font-size: 12.5px; color: var(--secondary); }
 .post-details .join-check input { flex: none; width: 15px; height: 15px; margin: 0; }
 .post-actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px 20px; flex-wrap: wrap; margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line); }
@@ -397,9 +398,11 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .ideas-signin { margin: 26px 0 0; color: var(--secondary); font-size: 13px; line-height: 1.7; }
 .ideas-signin a { color: var(--blue); }
 
+@media (max-width: 1100px) {
+  .post-details-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 @media (max-width: 900px) {
   .post-form { grid-template-columns: minmax(0, 1fr); gap: 22px; }
-  .post-details-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 720px) {
   .event-badge { bottom: 8px; left: 8px; padding: 6px 9px; font-size: 9px; }
