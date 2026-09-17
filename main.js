@@ -59,6 +59,7 @@
       { id: 'pie-degustation', name: 'PIE Degustation!!', img: 'event-pie-degustation.webp', when: 'Date to be announced', langs: [], kw: ['pie', 'food', 'degustation', 'tasting', 'baking', 'eat'], badge: '' }
     ],
     stories: [
+      { id: 's-alessio', name: 'Alessio SATURNINO', img: 'member-alessio-saturnino.jpeg', sub: 'Where to eat real Italian food', kw: ['italian', 'food', 'restaurant', 'pizza', 'pasta', 'eat', 'dinner', 'la felicita', 'recommendation'], badge: 'Member' },
       { id: 's-tamara', name: 'Tamara Matijević', img: 'member-tamara-matijevic.jpeg', sub: 'On not feeling lonely in Paris', kw: ['lonely', 'friends', 'adjusting', 'new', 'difficult', 'students'], badge: 'Member' },
       { id: 's-sparlay', name: 'Sparlay Khan', img: 'member-sparlay-khan.jpeg', sub: 'On the people she met', kw: ['people', 'friends', 'learned', 'community', 'connect'], badge: 'Member' }
     ]

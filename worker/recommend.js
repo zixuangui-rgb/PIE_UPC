@@ -32,6 +32,7 @@ EVENTS — id | title | date time | category | languages | notes | all example
 - pie-degustation | PIE Degustation!! | date to be announced | food & friends | EN | date and place to be announced | real notice from the PIE team
 
 EXPERIENCES — id | member | theme | author | real
+- s-alessio | Where to eat real Italian food | a recommendation: La Felicità, the Italian food hall at Station F | Alessio SATURNINO | real member quote
 - s-tamara | On not feeling lonely in Paris | settling in and finding company | Tamara Matijević | real member quote
 - s-sparlay | On the people she met | community and what she learned | Sparlay Khan | real member quote
 
@@ -57,7 +58,7 @@ OUTPUT SCHEMA
 export const CATALOG_IDS = {
   member: new Set(['sparlay-khan', 'zixuan-gui', 'tamara-matijevic', 'alessio-saturnino', 'amir-cheraghali', 'meghna-varma']),
   event: new Set(['monthly-meeting', 'karaoke-night', 'pie-degustation']),
-  story: new Set(['s-tamara', 's-sparlay'])
+  story: new Set(['s-alessio', 's-tamara', 's-sparlay'])
 };
 
 const MAX_INPUT_CHARS = 600;
