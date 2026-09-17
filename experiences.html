@@ -35,42 +35,52 @@
           <p class="demo-note">Words from PIE members.</p>
         </header>
         <section class="voices" aria-label="Member experiences">
-          <form class="post-form" id="voice-form" hidden>
-            <div class="post-main">
-              <label for="voice-quote">Your experience <span class="join-optional">what would you tell a new member?</span></label>
-              <textarea id="voice-quote" rows="3" maxlength="240" placeholder="The thing I would tell someone who has just arrived…"></textarea>
-
-              <details class="post-details" id="voice-details">
-                <summary>Add more <span class="join-optional">optional — place, details</span></summary>
-                <div class="post-details-grid">
-                  <div class="join-field">
-                    <label for="voice-place">Place or recommendation</label>
-                    <input id="voice-place" maxlength="60" placeholder="La Felicità, Station F" />
-                  </div>
-                </div>
-                <div class="join-field">
-                  <label for="voice-body">Tell us more</label>
-                  <textarea id="voice-body" rows="4" maxlength="600" placeholder="Practical details — how to get there, when to go…"></textarea>
-                </div>
-              </details>
-            </div>
-
-            <div class="post-side">
-              <div class="join-field">
-                <label>Sharing as</label>
-                <p class="voice-identity" id="voice-identity">Your profile</p>
-              </div>
-            </div>
-
-            <div class="post-actions">
-              <button type="submit" class="finder-submit" id="voice-submit"><span class="finder-submit-label">Publish</span></button>
-              <button type="button" class="join-link" id="voice-cancel" hidden>Cancel edit</button>
-              <p class="join-hint join-hint--status" id="voice-hint"></p>
-            </div>
-          </form>
           <div class="voice-grid" id="voice-grid" aria-live="polite"></div>
           <p class="voices-empty" id="voices-empty">No experiences shared yet — be the first to tell your story.</p>
-          <p class="ideas-signin" id="voices-signin">Only verified members can share an experience. <a href="./join.html">Verify your email to join</a>.</p>
+
+          <details class="share" id="share-voice">
+            <summary class="share-trigger">
+              <span class="share-icon" aria-hidden="true"></span>
+              <span class="share-title">Share your experience</span>
+              <span class="share-cta">Tell your story <span aria-hidden="true">↗</span></span>
+            </summary>
+
+            <form class="post-form" id="voice-form" hidden>
+              <div class="post-main">
+                <label for="voice-quote">Your experience <span class="join-optional">what would you tell a new member?</span></label>
+                <textarea id="voice-quote" rows="3" maxlength="240" placeholder="The thing I would tell someone who has just arrived…"></textarea>
+
+                <details class="post-details" id="voice-details">
+                  <summary>Add more <span class="join-optional">optional — place, details</span></summary>
+                  <div class="post-details-grid">
+                    <div class="join-field">
+                      <label for="voice-place">Place or recommendation</label>
+                      <input id="voice-place" maxlength="60" placeholder="La Felicità, Station F" />
+                    </div>
+                  </div>
+                  <div class="join-field">
+                    <label for="voice-body">Tell us more</label>
+                    <textarea id="voice-body" rows="4" maxlength="600" placeholder="Practical details — how to get there, when to go…"></textarea>
+                  </div>
+                </details>
+              </div>
+
+              <div class="post-side">
+                <div class="join-field">
+                  <label>Sharing as</label>
+                  <p class="voice-identity" id="voice-identity">Your profile</p>
+                </div>
+              </div>
+
+              <div class="post-actions">
+                <button type="submit" class="finder-submit" id="voice-submit"><span class="finder-submit-label">Publish</span></button>
+                <button type="button" class="join-link" id="voice-cancel" hidden>Cancel edit</button>
+                <p class="join-hint join-hint--status" id="voice-hint"></p>
+              </div>
+            </form>
+
+            <p class="ideas-signin" id="voices-signin">Only verified members can share an experience. <a href="./join.html">Verify your email to join</a>.</p>
+          </details>
         </section>
       </main>
       <footer class="site-footer">

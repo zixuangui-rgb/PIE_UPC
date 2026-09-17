@@ -91,55 +91,65 @@
         <section class="ideas" aria-labelledby="ideas-title">
           <header class="ideas-heading">
             <p class="section-kicker">FROM THE COMMUNITY</p>
-            <h2 id="ideas-title">Have an idea for an event?</h2>
-            <p class="ideas-lead">Members can share an idea and it appears here straight away. These are suggestions from the community, not confirmed events.</p>
+            <h2 id="ideas-title">Ideas from members</h2>
+            <p class="ideas-lead">Suggestions shared by the community — not confirmed events.</p>
           </header>
+
           <div class="ideas-list" id="ideas-list" aria-live="polite"></div>
           <p class="ideas-empty" id="ideas-empty">No ideas yet — be the first.</p>
 
-          <form class="idea-form" id="idea-form" hidden>
-            <div class="idea-main">
-              <label for="idea-text">Your idea</label>
-              <textarea id="idea-text" rows="4" maxlength="200" placeholder="A picnic in the park when it gets warmer…"></textarea>
-            </div>
+          <details class="share" id="share-idea">
+            <summary class="share-trigger">
+              <span class="share-icon" aria-hidden="true"></span>
+              <span class="share-title">Have an idea for an event?</span>
+              <span class="share-cta">Share it <span aria-hidden="true">↗</span></span>
+            </summary>
 
-            <div class="idea-side">
-              <div class="join-field">
-                <label for="idea-name">Name <span class="join-optional">optional — leave empty to stay anonymous</span></label>
-                <input id="idea-name" maxlength="40" />
+            <form class="post-form" id="idea-form" hidden>
+              <div class="post-main">
+                <label for="idea-text">Your idea</label>
+                <textarea id="idea-text" rows="3" maxlength="200" placeholder="A picnic in the park when it gets warmer…"></textarea>
+
+                <details class="post-details" id="idea-details">
+                  <summary>Add details <span class="join-optional">optional — date, time, place</span></summary>
+                  <div class="post-details-grid">
+                    <div class="join-field">
+                      <label for="idea-title">Event name</label>
+                      <input id="idea-title" maxlength="60" placeholder="Karaoke night" />
+                    </div>
+                    <div class="join-field">
+                      <label for="idea-date">Suggested date</label>
+                      <input id="idea-date" type="date" />
+                    </div>
+                    <div class="join-field">
+                      <label for="idea-time">Time</label>
+                      <input id="idea-time" type="time" />
+                    </div>
+                    <div class="join-field">
+                      <label for="idea-place">Place</label>
+                      <input id="idea-place" maxlength="60" placeholder="Parc de Sceaux" />
+                    </div>
+                  </div>
+                  <label class="join-check"><input type="checkbox" id="idea-flexible" /> <span>The date is flexible — I am not fixed on a day</span></label>
+                </details>
               </div>
-            </div>
 
-            <details class="idea-details" id="idea-details">
-              <summary>Add details <span class="join-optional">optional — date, time, place</span></summary>
-              <div class="idea-details-grid">
+              <div class="post-side">
                 <div class="join-field">
-                  <label for="idea-title">Event name</label>
-                  <input id="idea-title" maxlength="60" placeholder="Karaoke night" />
-                </div>
-                <div class="join-field">
-                  <label for="idea-date">Suggested date</label>
-                  <input id="idea-date" type="date" />
-                </div>
-                <div class="join-field">
-                  <label for="idea-time">Time</label>
-                  <input id="idea-time" type="time" />
-                </div>
-                <div class="join-field">
-                  <label for="idea-place">Place</label>
-                  <input id="idea-place" maxlength="60" placeholder="Parc de Sceaux" />
+                  <label for="idea-name">Name <span class="join-optional">optional — leave empty to stay anonymous</span></label>
+                  <input id="idea-name" maxlength="40" />
                 </div>
               </div>
-              <label class="join-check"><input type="checkbox" id="idea-flexible" /> <span>The date is flexible — I am not fixed on a day</span></label>
-            </details>
 
-            <div class="idea-form-actions">
-              <button type="submit" class="finder-submit" id="idea-submit"><span class="finder-submit-label">Submit idea</span></button>
-              <button type="button" class="join-link" id="idea-cancel" hidden>Cancel edit</button>
-              <p class="join-hint join-hint--status" id="idea-hint"></p>
-            </div>
-          </form>
-          <p class="ideas-signin" id="ideas-signin">Want to add your idea? <a href="./join.html">Verify your email to join the directory</a> — ideas come from verified members.</p>
+              <div class="post-actions">
+                <button type="submit" class="finder-submit" id="idea-submit"><span class="finder-submit-label">Submit idea</span></button>
+                <button type="button" class="join-link" id="idea-cancel" hidden>Cancel edit</button>
+                <p class="join-hint join-hint--status" id="idea-hint"></p>
+              </div>
+            </form>
+
+            <p class="ideas-signin" id="ideas-signin">Only verified members can share an idea. <a href="./join.html">Verify your email to join</a>.</p>
+          </details>
         </section>
       </main>
       <footer class="site-footer">

@@ -748,6 +748,7 @@
     const placeField = document.getElementById('idea-place');
     const flexibleField = document.getElementById('idea-flexible');
     const detailsBox = document.getElementById('idea-details');
+    const shareBox = document.getElementById('share-idea');
     const cancelEdit = document.getElementById('idea-cancel');
     const submitLabel = document.querySelector('#idea-submit .finder-submit-label');
     let editingId = '';
@@ -856,6 +857,7 @@
       placeField.value = idea.place || '';
       flexibleField.checked = !!idea.dateFlexible;
       detailsBox.open = true;
+      if (shareBox) shareBox.open = true;
       submitLabel.textContent = 'Save changes';
       cancelEdit.hidden = false;
       setHint('Editing your idea.', null);
@@ -911,6 +913,7 @@
       const wasEditing = !!editingId;
       const saved = data && data.idea ? data.idea : null;
       resetForm();
+      if (shareBox) shareBox.open = false;
       setHint(wasEditing ? 'Saved — the idea has been updated.' : 'Posted — your idea is on the board.', 'ok');
       // The write is visible to this browser immediately; the shared list
       // catches up once the edge cache refreshes.
@@ -940,6 +943,7 @@
     const placeField = document.getElementById('voice-place');
     const bodyField = document.getElementById('voice-body');
     const detailsBox = document.getElementById('voice-details');
+    const shareBox = document.getElementById('share-voice');
     const identity = document.getElementById('voice-identity');
     const hint = document.getElementById('voice-hint');
     const publish = document.getElementById('voice-submit');
@@ -1061,6 +1065,7 @@
       placeField.value = story.place || '';
       bodyField.value = story.body || '';
       if (story.place || story.body) detailsBox.open = true;
+      if (shareBox) shareBox.open = true;
       publishLabel.textContent = 'Save changes';
       cancelEdit.hidden = false;
       setVoiceHint('Editing your experience.', null);
@@ -1090,6 +1095,7 @@
       const saved = data && data.story ? data.story : null;
       const wasEditing = !!editingVoice;
       resetVoiceForm();
+      if (shareBox) shareBox.open = false;
       setVoiceHint(wasEditing ? 'Saved — your experience has been updated.' : 'Published — thank you for sharing.', 'ok');
       if (saved) {
         renderVoices(wasEditing && voicesCache.some((item) => item.id === saved.id)
