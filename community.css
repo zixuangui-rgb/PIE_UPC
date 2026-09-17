@@ -209,6 +209,14 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .finder-submit-label { font: italic 400 17px/1 var(--serif); letter-spacing: .01em; }
 .finder-submit-arrow { flex: none; display: block; }
 .finder-privacy { margin: 12px 2px 0; color: var(--secondary); font-size: 11px; line-height: 1.6; }
+.finder-join { margin: 14px 2px 0; color: var(--secondary); font-size: 12.5px; }
+.finder-join a { color: var(--blue); font-weight: 500; text-decoration: none; }
+.finder-join a:hover { text-decoration: underline; }
+.masthead-side { display: flex; align-items: center; gap: clamp(14px, 2vw, 26px); }
+.masthead-join { color: var(--blue); font-size: 12px; font-weight: 600; letter-spacing: .02em; text-decoration: none; border-bottom: 1px solid transparent; padding-bottom: 2px; }
+.masthead-join:hover { border-bottom-color: var(--blue); }
+.gateway-sub { display: block; margin-top: 10px; color: var(--secondary); font-size: 11.5px; line-height: 1.6; text-decoration: none; }
+.gateway-sub:hover { color: var(--blue); }
 .finder-examples { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 24px; }
 .finder-examples > span { color: var(--secondary); font-size: 12px; }
 .finder-example { min-height: 34px; padding: 7px 15px; background: var(--paper); border: 1px solid var(--line); border-radius: 18px; color: var(--secondary); font: 400 12.5px/1.4 var(--sans); cursor: pointer; transition: color .2s ease, border-color .2s ease; }
