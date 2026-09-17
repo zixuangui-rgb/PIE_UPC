@@ -910,7 +910,28 @@
   const voiceGrid = document.getElementById('voice-grid');
   if (voiceGrid) {
     const empty = document.getElementById('voices-empty');
+    const form = document.getElementById('voice-form');
+    const signin = document.getElementById('voices-signin');
+    const quoteField = document.getElementById('voice-quote');
+    const placeField = document.getElementById('voice-place');
+    const bodyField = document.getElementById('voice-body');
+    const detailsBox = document.getElementById('voice-details');
+    const identity = document.getElementById('voice-identity');
+    const hint = document.getElementById('voice-hint');
+    const publish = document.getElementById('voice-submit');
+    const publishLabel = publish.querySelector('.finder-submit-label');
+    const cancelEdit = document.getElementById('voice-cancel');
+    let voicesCache = [];
+    let editingVoice = '';
+    let myVoiceId = null;
+
+    const setVoiceHint = (message, kind) => {
+      hint.textContent = message || '';
+      hint.className = 'join-hint join-hint--status' + (kind ? ' is-' + kind : '');
+    };
+
     const renderVoices = (stories) => {
+      voicesCache = stories;
       voiceGrid.innerHTML = '';
       empty.hidden = stories.length > 0;
       for (const story of stories) {
@@ -951,6 +972,13 @@
         head.appendChild(who);
         card.appendChild(head);
 
+        if (story.place) {
+          const chip = document.createElement('p');
+          chip.className = 'voice-place';
+          chip.textContent = story.place;
+          card.appendChild(chip);
+        }
+
         const quote = document.createElement('blockquote');
         quote.className = 'voice-quote';
         quote.textContent = story.quote;
@@ -966,12 +994,125 @@
           details.append(summary, text);
           card.appendChild(details);
         }
+        if (myVoiceId && story.authorId === myVoiceId) {
+          const tools = document.createElement('p');
+          tools.className = 'voice-tools';
+          const mine = document.createElement('span');
+          mine.className = 'voice-you';
+          mine.textContent = 'This is you';
+          const edit = document.createElement('button');
+          edit.type = 'button';
+          edit.className = 'idea-delete';
+          edit.textContent = 'Edit';
+          edit.addEventListener('click', () => startVoiceEdit(story));
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.className = 'idea-delete';
+          remove.textContent = 'Delete';
+          remove.addEventListener('click', async () => {
+            if (!window.confirm('Remove your experience from the page?')) return;
+            const { ok } = await apiFetch('/stories/' + story.id, { method: 'DELETE', headers: { Authorization: 'Bearer ' + session.token } });
+            if (ok) renderVoices(voicesCache.filter((item) => item.id !== story.id));
+          });
+          tools.append(mine, edit, remove);
+          card.appendChild(tools);
+        }
         voiceGrid.appendChild(card);
       }
     };
 
+    const resetVoiceForm = () => {
+      editingVoice = '';
+      quoteField.value = '';
+      placeField.value = '';
+      bodyField.value = '';
+      detailsBox.open = false;
+      publishLabel.textContent = 'Publish';
+      cancelEdit.hidden = true;
+    };
+
+    const startVoiceEdit = (story) => {
+      editingVoice = story.id;
+      quoteField.value = story.quote || '';
+      placeField.value = story.place || '';
+      bodyField.value = story.body || '';
+      if (story.place || story.body) detailsBox.open = true;
+      publishLabel.textContent = 'Save changes';
+      cancelEdit.hidden = false;
+      setVoiceHint('Editing your experience.', null);
+      form.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    };
+
+    cancelEdit.addEventListener('click', () => {
+      resetVoiceForm();
+      setVoiceHint('Edit cancelled.', null);
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const quote = quoteField.value.trim();
+      if (quote.length < 10) { setVoiceHint('Please write a little more.', 'error'); return; }
+      publish.disabled = true;
+      setVoiceHint(editingVoice ? 'Saving…' : 'Publishing…');
+      const payload = { quote, place: placeField.value.trim(), body: bodyField.value.trim() };
+      const target = editingVoice ? '/stories/' + editingVoice : '/stories';
+      const { ok, data } = await apiFetch(target, {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + session.token },
+        body: JSON.stringify(payload)
+      });
+      publish.disabled = false;
+      if (!ok) { setVoiceHint((data && data.error) || 'Could not publish.', 'error'); return; }
+      const saved = data && data.story ? data.story : null;
+      const wasEditing = !!editingVoice;
+      resetVoiceForm();
+      setVoiceHint(wasEditing ? 'Saved — your experience has been updated.' : 'Published — thank you for sharing.', 'ok');
+      if (saved) {
+        renderVoices(wasEditing && voicesCache.some((item) => item.id === saved.id)
+          ? voicesCache.map((item) => (item.id === saved.id ? saved : item))
+          : [saved, ...voicesCache.filter((item) => item.id !== saved.id)]);
+      }
+    });
+
+    loadSession().then((active) => {
+      if (active) {
+        myVoiceId = active.profileId || null;
+        form.hidden = false;
+        signin.hidden = true;
+        const who = (active.profile && active.profile.name) || active.email;
+        identity.textContent = who + ((active.profile && active.profile.role) ? ' · ' + active.profile.role : '');
+      } else {
+        form.hidden = true;
+        signin.hidden = false;
+      }
+      apiFetch('/stories').then(({ ok, data }) => {
+        renderVoices(ok && data ? data.stories || [] : []);
+      });
+    });
+  }
+
+  // Homepage: the experiences gateway always shows the newest member quote.
+  const homeQuote = document.querySelector('.experience-preview blockquote');
+  if (homeQuote) {
     apiFetch('/stories').then(({ ok, data }) => {
-      renderVoices(ok && data ? data.stories || [] : []);
+      const latest = ok && data && data.stories && data.stories[0];
+      if (!latest) return;
+      homeQuote.textContent = latest.quote;
+      const author = latest.author || {};
+      const authorWrap = document.querySelector('.experience-preview .preview-story-author > span:last-child');
+      const dot = document.querySelector('.experience-preview .story-author-dot');
+      if (authorWrap) {
+        const role = [author.role, author.country].filter(Boolean).join(' · ');
+        authorWrap.textContent = author.name || 'PIE member';
+        if (role) {
+          const sub = document.createElement('span');
+          sub.textContent = role;
+          authorWrap.appendChild(sub);
+        }
+      }
+      if (dot && author.name) {
+        dot.textContent = author.name.split(/\s+/).slice(0, 2).map((part) => part.charAt(0).toUpperCase()).join('');
+      }
     });
   }
 })();

@@ -1,7 +1,7 @@
 // PIE Worker entry point — routes the AI recommendation endpoint and the
 // account service through one origin.
 
-import { recommend, CATALOG_IDS, SYSTEM_PROMPT, buildDynamicLines } from './recommend.js';
+import { recommend, CATALOG_IDS, SYSTEM_PROMPT, buildDynamicLines, buildStoryLines } from './recommend.js';
 import { handleAccount } from './account.js';
 
 const CORS = {
@@ -43,6 +43,18 @@ async function dynamicMembers(env) {
   return members;
 }
 
+async function dynamicStories(env) {
+  if (!env || !env.PIE_KV) return [];
+  const listed = await env.PIE_KV.list({ prefix: 'story:' });
+  const stories = [];
+  for (const entry of listed.keys) {
+    const record = JSON.parse((await env.PIE_KV.get(entry.name)) || 'null');
+    if (record && record.quote) stories.push(record);
+  }
+  stories.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  return stories.slice(0, 20);
+}
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
@@ -60,7 +72,8 @@ export default {
       if (!input) return json({ error: 'input required' }, 400);
       try {
         const extras = await dynamicMembers(env);
-        const result = await recommend(input, env.DEEPSEEK_API_KEY, extras);
+        const stories = await dynamicStories(env);
+        const result = await recommend(input, env.DEEPSEEK_API_KEY, extras, stories);
         return json(result);
       } catch (err) {
         return json({ error: 'recommendation failed' }, 502);
@@ -77,4 +90,4 @@ export default {
   }
 };
 
-export { SYSTEM_PROMPT, CATALOG_IDS, buildDynamicLines };
+export { SYSTEM_PROMPT, CATALOG_IDS, buildDynamicLines, buildStoryLines };

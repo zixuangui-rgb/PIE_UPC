@@ -32,9 +32,6 @@ EVENTS — id | title | date time | category | languages | notes | all example
 - pie-degustation | PIE Degustation!! | date to be announced | food & friends | EN | date and place to be announced | real notice from the PIE team
 
 EXPERIENCES — id | member | theme | author | real
-- s-alessio | Where to eat real Italian food | a recommendation: La Felicità, the Italian food hall at Station F | Alessio SATURNINO | real member quote
-- s-tamara | On not feeling lonely in Paris | settling in and finding company | Tamara Matijević | real member quote
-- s-sparlay | On the people she met | community and what she learned | Sparlay Khan | real member quote
 
 RULES
 1. Recommend ONLY ids that appear verbatim in the catalog. Never invent people, events, stories, links or email addresses.
@@ -58,7 +55,7 @@ OUTPUT SCHEMA
 export const CATALOG_IDS = {
   member: new Set(['sparlay-khan', 'zixuan-gui', 'tamara-matijevic', 'alessio-saturnino', 'amir-cheraghali', 'meghna-varma']),
   event: new Set(['monthly-meeting', 'karaoke-night', 'pie-degustation']),
-  story: new Set(['s-alessio', 's-tamara', 's-sparlay'])
+  story: new Set()
 };
 
 const MAX_INPUT_CHARS = 600;
@@ -74,13 +71,24 @@ export function buildDynamicLines(members) {
   }).join('\n');
 }
 
+// Member experiences stored in KV are injected at request time so anything a
+// member publishes becomes recommendable straight away.
+export function buildStoryLines(stories) {
+  if (!stories || !stories.length) return '';
+  return stories.map((item) => {
+    const name = item.authorName || (item.author && item.author.name) || 'PIE member';
+    const theme = item.place ? `${item.place} — a member recommendation` : 'a member experience';
+    return `- ${item.id} | ${item.quote.slice(0, 90)} | ${theme} | ${name} | real member quote`;
+  }).join('\n');
+}
+
 function cleanPick(pick, allowed) {
   if (!pick || typeof pick.id !== 'string' || !allowed.has(pick.id)) return null;
   const reason = typeof pick.reason === 'string' ? pick.reason.trim().slice(0, 220) : '';
   return { id: pick.id, reason };
 }
 
-function validate(parsed, allowedMembers) {
+function validate(parsed, allowedMembers, allowedStories) {
   const str = (v) => (typeof v === 'string' ? v.trim().slice(0, 220) : '');
   return {
     mode: 'ai',
@@ -89,18 +97,22 @@ function validate(parsed, allowedMembers) {
     note: str(parsed.note),
     member: cleanPick(parsed.member, allowedMembers || CATALOG_IDS.member),
     event: cleanPick(parsed.event, CATALOG_IDS.event),
-    story: cleanPick(parsed.story, CATALOG_IDS.story)
+    story: cleanPick(parsed.story, allowedStories || CATALOG_IDS.story)
   };
 }
 
-export async function recommend(input, apiKey, extras = []) {
+export async function recommend(input, apiKey, extras = [], stories = []) {
   const text = String(input || '').trim().slice(0, MAX_INPUT_CHARS);
   if (!text) throw new Error('empty input');
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date());
   const dynamicLines = buildDynamicLines(extras);
+  const storyLines = buildStoryLines(stories);
   let system = SYSTEM_PROMPT.replace('{CURRENT_DATE}', today);
   if (dynamicLines) {
     system = system.replace('\n\nEVENTS — id |', `\n${dynamicLines}\n\nEVENTS — id |`);
+  }
+  if (storyLines) {
+    system = system.replace('\n\nRULES', `\n${storyLines}\n\nRULES`);
   }
   const allowedMembers = dynamicLines
     ? new Set([...CATALOG_IDS.member, ...extras.map((m) => m.id)])
@@ -126,5 +138,8 @@ export async function recommend(input, apiKey, extras = []) {
   const data = await resp.json();
   const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
   if (!content) throw new Error('empty completion');
-  return validate(JSON.parse(content), allowedMembers);
+  const allowedStories = stories.length
+    ? new Set([...CATALOG_IDS.story, ...stories.map((item) => item.id)])
+    : CATALOG_IDS.story;
+  return validate(JSON.parse(content), allowedMembers, allowedStories);
 }

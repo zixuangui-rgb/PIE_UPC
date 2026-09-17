@@ -380,6 +380,7 @@ export async function handleAccount(request, env, url) {
     const quote = clean(body.quote, 240);
     if (quote.length < 10) return json({ error: 'please write a little more' }, 400);
     const detail = clean(body.body, 600);
+    const place = clean(body.place, 60);
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
     if (!(await bump(env, `story-email:${session.email}`, 3, 3600))) return json({ error: 'you have shared a few already, please try again later' }, 429);
     await bump(env, `story-ip:${ip}`, 10, 3600);
@@ -391,12 +392,36 @@ export async function handleAccount(request, env, url) {
     const record = {
       id: 's-' + randomToken().slice(0, 12),
       quote,
+      place,
       body: detail,
       authorId,
       createdAt: Date.now()
     };
     await env.PIE_KV.put(`story:${record.id}`, JSON.stringify(record));
     return json({ story: { ...record, author: await authorInfo(env, authorId) } });
+  }
+
+  // ---- edit your own experience --------------------------------------------
+  if (path.startsWith('/stories/') && request.method === 'POST') {
+    const session = await sessionFrom(request, env);
+    if (!session) return json({ error: 'not signed in' }, 401);
+    const id = clean(path.slice('/stories/'.length), 40);
+    const record = JSON.parse((await env.PIE_KV.get(`story:${id}`)) || 'null');
+    if (!record) return json({ error: 'not found' }, 404);
+    if (!(await ownsIdea(env, session, { authorId: record.authorId }))) return json({ error: 'you can only edit your own experience' }, 403);
+    let body = {};
+    try { body = await request.json(); } catch { body = {}; }
+    const quote = clean(body.quote, 240);
+    if (quote.length < 10) return json({ error: 'please write a little more' }, 400);
+    const updated = {
+      ...record,
+      quote,
+      place: clean(body.place, 60),
+      body: clean(body.body, 600),
+      updatedAt: Date.now()
+    };
+    await env.PIE_KV.put(`story:${id}`, JSON.stringify(updated));
+    return json({ story: { ...updated, author: await authorInfo(env, updated.authorId) } });
   }
 
   if (path.startsWith('/stories/') && request.method === 'DELETE') {
