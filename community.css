@@ -357,9 +357,9 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .idea-main { min-width: 0; }
 .idea-side { min-width: 0; display: flex; flex-direction: column; gap: 20px; }
 .idea-form[hidden] { display: none; }
-.idea-form label { display: block; margin: 0 0 8px; font-size: 12px; font-weight: 600; }
-.idea-form textarea, .idea-form input { width: 100%; padding: 12px 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 2px; color: var(--ink); font: 400 14px/1.6 var(--sans); resize: vertical; }
-.idea-form textarea:focus-visible, .idea-form input:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; border-color: var(--blue); }
+.idea-main > label, .idea-form .join-field label { display: block; margin: 0 0 8px; font-size: 12px; font-weight: 600; }
+.idea-form textarea, .idea-form input:not([type="checkbox"]) { width: 100%; padding: 12px 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 2px; color: var(--ink); font: 400 14px/1.6 var(--sans); resize: vertical; }
+.idea-form textarea:focus-visible, .idea-form input:not([type="checkbox"]):focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; border-color: var(--blue); }
 .idea-side .join-field { margin: 0; }
 .idea-form-actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px 18px; flex-wrap: wrap; padding-top: 22px; border-top: 1px solid var(--line); }
 .idea-form-actions .join-hint { margin: 0; }
@@ -383,7 +383,8 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .idea-details[open] summary { padding-bottom: 14px; }
 .idea-details-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 22px; margin-bottom: 4px; }
 .idea-details .join-field label { font-size: 11.5px; }
-.idea-details .join-check { margin-top: 14px; }
+.idea-details .join-check { display: flex; align-items: center; gap: 10px; margin: 16px 0 0; }
+.idea-details .join-check input { flex: none; width: 15px; height: 15px; margin: 0; }
 
 @media (max-width: 620px) {
   .idea-details-grid { grid-template-columns: minmax(0, 1fr); }
