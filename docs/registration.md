@@ -36,11 +36,21 @@ members.html
 ## Rules
 
 - Only the six supplied real profiles can be claimed, and only through their own address; the 22 demo profiles use `example.com` placeholders and cannot be claimed.
-- A claimed profile is stored as an edit on top of the static card, so `members.html` stays readable without JavaScript and without the service.
+- A claimed profile is stored as an edit on top of the static card, so `members.html` stays readable without JavaScript and without the service. The member's complete profile is stored and returned, so a cleared field (for example an emptied introduction) is cleared on the card as well.
 - New profiles are published immediately (no approval step) and appear at the end of the directory with a **Member** badge.
-- Email addresses are hidden unless the member ticks "show my email"; the six supplied profiles keep the addresses the team provided.
+- Email addresses are shown on every profile; there is no privacy toggle.
 - Photos are resized in the browser to 400 × 400 and stored in KV; the page then loads them from `/photo/<id>`.
 - Registered members also join the AI recommendation catalog: the Worker appends them to the prompt and accepts their ids from the model.
+
+## Signed-in state
+
+Every page asks the service once (`GET /me`) when a session token is present and adapts its account links:
+
+- Homepage masthead, footer and the inner-page navigation show **“Hi, ‹first name› · My profile”** instead of “Join”.
+- The line under the Find your PIE box, which invites visitors to add a profile, is hidden.
+- The members page marks the signed-in member's own card with a **This is you** badge and an **Edit** link.
+- The join page hides the email step, shows a signed-in bar with the address plus **Sign out** / **Switch account**, and goes straight to the profile form.
+- An expired session is reported on the join page (“Your session expired — please verify your email again.”) instead of failing silently.
 
 ## Limits and protections
 
