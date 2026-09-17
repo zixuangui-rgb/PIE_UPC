@@ -12,7 +12,7 @@
 export const SYSTEM_PROMPT = `You are the recommendation engine of PIE (Paris International Exchange), a student community website in Paris.
 
 TASK
-A visitor wrote a short self-description. For each of the three content types below, choose the single best match — one member to meet, one event to join, one story to read — and explain each pick in one warm, specific sentence.
+A visitor wrote a short self-description. For each of the three content types below, choose the single best match — one member to meet, one event to join, one member quote to read — and explain each pick in one warm, specific sentence.
 
 CURRENT DATE: {CURRENT_DATE} (Europe/Paris). Never recommend an event whose date has already passed.
 
@@ -31,19 +31,9 @@ EVENTS — id | title | date time | category | languages | notes | all example
 - karaoke-night | Karaoke night! | Tue 22 Sep 2026 | music & friends | EN | time and place to be announced | real notice from the PIE team
 - pie-degustation | PIE Degustation!! | date to be announced | food & friends | EN | date and place to be announced | real notice from the PIE team
 
-STORIES — id | title | theme | author | all example
-- finding-my-first-familiar-faces | Finding my first familiar faces | settling in | Aya Tanaka
-- paris-one-small-routine | Paris, one small routine at a time | everyday Paris | Mateo Silva
-- the-afternoon-i-said-yes | The afternoon I said yes | getting involved | Lina Moreau
-- a-small-plan-for-a-shared-kitchen | A small plan for a shared kitchen | student life | Salma Nouri
-- joining-a-game-without-knowing-the-rules | Joining a game without knowing the rules | meeting people | Elias Lind
-- leaving-paris-keeping-in-touch | Leaving Paris, keeping in touch | alumni connections | Aminata Diop
-- putting-the-camera-down | Putting the camera down | noticing the city | Chen Wei
-- asking-people-to-slow-down | Asking people to slow down | finding the words | Kavya Rao
-- a-study-session-one-small-question | A study session, one small question | studying together | Arjun Mehta
-- making-room-for-a-quiet-weekend | Making room for a quiet weekend | finding your pace | Beatriz Costa
-- a-handover-that-fit-on-one-page | A handover that fit on one page | passing things on | Imane Benali
-- making-a-plan-people-could-actually-join | Making a plan people could actually join | small plans | Yuting Lin
+EXPERIENCES — id | member | theme | author | real
+- s-tamara | On not feeling lonely in Paris | settling in and finding company | Tamara Matijević | real member quote
+- s-sparlay | On the people she met | community and what she learned | Sparlay Khan | real member quote
 
 RULES
 1. Recommend ONLY ids that appear verbatim in the catalog. Never invent people, events, stories, links or email addresses.
@@ -67,7 +57,7 @@ OUTPUT SCHEMA
 export const CATALOG_IDS = {
   member: new Set(['sparlay-khan', 'zixuan-gui', 'tamara-matijevic', 'alessio-saturnino', 'amir-cheraghali', 'meghna-varma']),
   event: new Set(['monthly-meeting', 'karaoke-night', 'pie-degustation']),
-  story: new Set(['finding-my-first-familiar-faces', 'paris-one-small-routine', 'the-afternoon-i-said-yes', 'a-small-plan-for-a-shared-kitchen', 'joining-a-game-without-knowing-the-rules', 'leaving-paris-keeping-in-touch', 'putting-the-camera-down', 'asking-people-to-slow-down', 'a-study-session-one-small-question', 'making-room-for-a-quiet-weekend', 'a-handover-that-fit-on-one-page', 'making-a-plan-people-could-actually-join'])
+  story: new Set(['s-tamara', 's-sparlay'])
 };
 
 const MAX_INPUT_CHARS = 600;

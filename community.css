@@ -398,3 +398,27 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
   .idea-form { grid-template-columns: minmax(0, 1fr); gap: 22px; }
   .idea-details-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Member experiences: quote cards bound to their author. */
+.voices { padding: 8px 0 88px; }
+.voice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.voice-card { min-width: 0; display: flex; flex-direction: column; padding: clamp(22px, 2.4vw, 32px); background: #fff; border: 1px solid var(--line); }
+.voice-author { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.voice-portrait { flex: none; width: 56px; height: 56px; border-radius: 50%; object-fit: cover; background: var(--members-paper); }
+.voice-name { margin: 0; font: 400 19px/1.25 var(--serif); letter-spacing: -.01em; }
+.voice-name a { text-decoration: none; }
+.voice-name a:hover { color: var(--blue); }
+.voice-role { margin: 4px 0 0; color: var(--secondary); font-size: 11px; line-height: 1.5; }
+.voice-quote { margin: 0; font: italic 400 clamp(19px, 1.65vw, 24px)/1.45 var(--serif); color: var(--ink); letter-spacing: -.005em; }
+.voice-quote::before { content: '\201C'; }
+.voice-quote::after { content: '\201D'; }
+.voice-details { margin-top: 20px; border-top: 1px solid var(--line); }
+.voice-details summary { padding: 14px 0 2px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--blue); }
+.voice-details p { margin: 12px 0 0; color: var(--secondary); font-size: 14px; line-height: 1.8; }
+.voices-empty { margin: 0; color: var(--secondary); font-size: 13px; }
+.voices-empty[hidden] { display: none; }
+
+@media (max-width: 860px) {
+  .voice-grid { grid-template-columns: minmax(0, 1fr); }
+  .voices { padding-bottom: 60px; }
+}

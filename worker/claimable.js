@@ -58,3 +58,9 @@ const BY_EMAIL = new Map(Object.entries(CLAIMABLE).map(([email, p]) => [email.to
 export function findClaimableByEmail(email) {
   return BY_EMAIL.get(String(email || '').toLowerCase()) || null;
 }
+
+const BY_ID = new Map(Object.values(CLAIMABLE).map((p) => [p.id, p]));
+
+export function findClaimableById(id) {
+  return BY_ID.get(String(id || '')) || null;
+}

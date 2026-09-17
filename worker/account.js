@@ -13,7 +13,7 @@
 // the secret the service runs in demo mode and returns the code in the response
 // so the flow can be tested end to end.
 
-import { CLAIMABLE, findClaimableByEmail } from './claimable.js';
+import { CLAIMABLE, findClaimableByEmail, findClaimableById } from './claimable.js';
 
 const CODE_TTL = 600;            // 10 minutes
 const SESSION_TTL = 60 * 60 * 24 * 30;
@@ -138,6 +138,26 @@ async function sessionFrom(request, env) {
   if (!token) return null;
   const session = JSON.parse((await env.PIE_KV.get(key.session(token))) || 'null');
   return session && session.email ? { token, ...session } : null;
+}
+
+// Author details for a story: registered record first, then the base registry.
+async function authorInfo(env, id) {
+  if (!id) return null;
+  const record = await loadProfile(env, id);
+  if (record) {
+    const uploaded = typeof record.photo === 'string' && record.photo.startsWith('data:');
+    return {
+      id: record.id,
+      name: record.name,
+      role: record.role || '',
+      country: record.country || '',
+      photo: uploaded ? `/photo/${record.id}?v=${record.updatedAt}` : (record.photo || '')
+    };
+  }
+  const claimed = findClaimableById(id);
+  if (!claimed) return null;
+  const [role, country] = String(claimed.role || '').split(' · ');
+  return { id: claimed.id, name: claimed.name, role: role || '', country: country || '', photo: claimed.photoPath || '' };
 }
 
 async function ownsIdea(env, session, record) {
@@ -335,6 +355,58 @@ export async function handleAccount(request, env, url) {
     if (!record || !record.dynamic) return json({ error: 'directory profiles cannot be deleted here' }, 403);
     await env.PIE_KV.delete(key.profile(id));
     await env.PIE_KV.delete(key.email(session.email));
+    return json({ deleted: true });
+  }
+
+  // ---- member experiences: short quotes bound to their author ---------------
+  if (path === '/stories' && request.method === 'GET') {
+    const listed = await env.PIE_KV.list({ prefix: 'story:' });
+    const stories = [];
+    for (const entry of listed.keys) {
+      const record = JSON.parse((await env.PIE_KV.get(entry.name)) || 'null');
+      if (!record) continue;
+      record.author = await authorInfo(env, record.authorId);
+      stories.push(record);
+    }
+    stories.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    return json({ stories: stories.slice(0, 50) }, 200, { 'Cache-Control': 'no-store' });
+  }
+
+  if (path === '/stories' && request.method === 'POST') {
+    const session = await sessionFrom(request, env);
+    if (!session) return json({ error: 'only verified members can share an experience' }, 401);
+    let body = {};
+    try { body = await request.json(); } catch { body = {}; }
+    const quote = clean(body.quote, 240);
+    if (quote.length < 10) return json({ error: 'please write a little more' }, 400);
+    const detail = clean(body.body, 600);
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    if (!(await bump(env, `story-email:${session.email}`, 3, 3600))) return json({ error: 'you have shared a few already, please try again later' }, 429);
+    await bump(env, `story-ip:${ip}`, 10, 3600);
+
+    const profileId = await env.PIE_KV.get(key.email(session.email));
+    const claimed = findClaimableByEmail(session.email);
+    const authorId = profileId || (claimed ? claimed.id : '');
+    if (!authorId) return json({ error: 'please add your profile first' }, 400);
+    const record = {
+      id: 's-' + randomToken().slice(0, 12),
+      quote,
+      body: detail,
+      authorId,
+      createdAt: Date.now()
+    };
+    await env.PIE_KV.put(`story:${record.id}`, JSON.stringify(record));
+    return json({ story: { ...record, author: await authorInfo(env, authorId) } });
+  }
+
+  if (path.startsWith('/stories/') && request.method === 'DELETE') {
+    const session = await sessionFrom(request, env);
+    if (!session) return json({ error: 'not signed in' }, 401);
+    const id = clean(path.slice('/stories/'.length), 40);
+    const record = JSON.parse((await env.PIE_KV.get(`story:${id}`)) || 'null');
+    if (!record) return json({ error: 'not found' }, 404);
+    if (!(await ownsIdea(env, session, { authorId: record.authorId }))) return json({ error: 'you can only remove your own experience' }, 403);
+    await env.PIE_KV.delete(`story:${id}`);
     return json({ deleted: true });
   }
 

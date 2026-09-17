@@ -59,25 +59,15 @@
       { id: 'pie-degustation', name: 'PIE Degustation!!', img: 'event-pie-degustation.webp', when: 'Date to be announced', langs: [], kw: ['pie', 'food', 'degustation', 'tasting', 'baking', 'eat'], badge: '' }
     ],
     stories: [
-      { id: 'finding-my-first-familiar-faces', name: 'Finding my first familiar faces', img: 'story-familiar-faces.webp', sub: 'Aya Tanaka · Settling in', kw: ['friends', 'friendship', 'meeting people', 'new', 'shy', 'hello'], badge: 'Example' },
-      { id: 'paris-one-small-routine', name: 'Paris, one small routine at a time', img: 'story-paris-routine.webp', sub: 'Mateo Silva · Everyday Paris', kw: ['routine', 'home', 'city', 'neighbourhood', 'everyday'], badge: 'Example' },
-      { id: 'the-afternoon-i-said-yes', name: 'The afternoon I said yes', img: 'story-volunteering.webp', sub: 'Lina Moreau · Getting involved', kw: ['volunteer', 'volunteering', 'helping', 'getting involved', 'yes'], badge: 'Example' },
-      { id: 'a-small-plan-for-a-shared-kitchen', name: 'A small plan for a shared kitchen', img: 'story-shared-kitchen.webp', sub: 'Salma Nouri · Student life', kw: ['cooking', 'kitchen', 'groceries', 'meals', 'food'], badge: 'Example' },
-      { id: 'joining-a-game-without-knowing-the-rules', name: 'Joining a game without knowing the rules', img: 'story-first-game.webp', sub: 'Elias Lind · Meeting people', kw: ['board games', 'games', 'beginner', 'joining', 'meeting people'], badge: 'Example' },
-      { id: 'leaving-paris-keeping-in-touch', name: 'Leaving Paris, keeping in touch', img: 'story-keeping-in-touch.webp', sub: 'Aminata Diop · Alumni connections', kw: ['leaving', 'alumni', 'goodbye', 'keeping in touch', 'moving'], badge: 'Example' },
-      { id: 'putting-the-camera-down', name: 'Putting the camera down', img: 'story-camera-pause.webp', sub: 'Chen Wei · Noticing the city', kw: ['photography', 'camera', 'photo', 'noticing'], badge: 'Example' },
-      { id: 'asking-people-to-slow-down', name: 'Asking people to slow down', img: 'story-finding-the-words.webp', sub: 'Kavya Rao · Finding the words', kw: ['language', 'french', 'conversation', 'slow', 'words'], badge: 'Example' },
-      { id: 'a-study-session-one-small-question', name: 'A study session, one small question', img: 'story-study-question.webp', sub: 'Arjun Mehta · Studying together', kw: ['study', 'studying', 'library', 'course', 'class'], badge: 'Example' },
-      { id: 'making-room-for-a-quiet-weekend', name: 'Making room for a quiet weekend', img: 'story-quiet-weekend.webp', sub: 'Beatriz Costa · Finding your pace', kw: ['quiet', 'rest', 'tired', 'weekend', 'alone'], badge: 'Example' },
-      { id: 'a-handover-that-fit-on-one-page', name: 'A handover that fit on one page', img: 'story-one-page-handover.webp', sub: 'Imane Benali · Passing things on', kw: ['handover', 'volunteer', 'role', 'passing on'], badge: 'Example' },
-      { id: 'making-a-plan-people-could-actually-join', name: 'Making a plan people could actually join', img: 'story-making-a-plan.webp', sub: 'Yuting Lin · Small plans', kw: ['plan', 'planning', 'scheduling', 'organizing', 'join'], badge: 'Example' }
+      { id: 's-tamara', name: 'Tamara Matijević', img: 'member-tamara-matijevic.jpeg', sub: 'On not feeling lonely in Paris', kw: ['lonely', 'friends', 'adjusting', 'new', 'difficult', 'students'], badge: 'Member' },
+      { id: 's-sparlay', name: 'Sparlay Khan', img: 'member-sparlay-khan.jpeg', sub: 'On the people she met', kw: ['people', 'friends', 'learned', 'community', 'connect'], badge: 'Member' }
     ]
   };
 
   const TYPES = {
     member: { label: 'SOMEONE TO MEET', link: 'View profile', page: './members.html#' },
     event: { label: 'SOMETHING TO JOIN', link: 'View event', page: './events.html#' },
-    story: { label: 'SOMETHING TO READ', link: 'Read the story', page: './experiences.html#' }
+    story: { label: 'A MEMBER\u2019S WORDS', link: 'Read their words', page: './experiences.html#' }
   };
   const POOL_BY_KIND = { member: POOL.members, event: POOL.events, story: POOL.stories };
 
@@ -911,6 +901,76 @@
       } else {
         loadIdeas();
       }
+    });
+  }
+  // ---------------------------------------------------------------------------
+  // Experiences page: member quotes rendered from the service.
+  // ---------------------------------------------------------------------------
+  const voiceGrid = document.getElementById('voice-grid');
+  if (voiceGrid) {
+    const empty = document.getElementById('voices-empty');
+    const renderVoices = (stories) => {
+      voiceGrid.innerHTML = '';
+      empty.hidden = stories.length > 0;
+      for (const story of stories) {
+        const author = story.author || {};
+        const card = document.createElement('article');
+        card.className = 'voice-card';
+        card.id = story.id;
+
+        const head = document.createElement('div');
+        head.className = 'voice-author';
+        if (author.photo) {
+          const img = document.createElement('img');
+          img.className = 'voice-portrait';
+          img.src = photoUrl(author.photo);
+          img.alt = 'Portrait of ' + (author.name || 'a PIE member');
+          img.loading = 'lazy';
+          head.appendChild(img);
+        }
+        const who = document.createElement('div');
+        const name = document.createElement('p');
+        name.className = 'voice-name';
+        if (author.id) {
+          const link = document.createElement('a');
+          link.href = './members.html#' + author.id;
+          link.textContent = author.name || 'PIE member';
+          name.appendChild(link);
+        } else {
+          name.textContent = author.name || 'PIE member';
+        }
+        who.appendChild(name);
+        const role = [author.role, author.country].filter(Boolean).join(' · ');
+        if (role) {
+          const meta = document.createElement('p');
+          meta.className = 'voice-role';
+          meta.textContent = role;
+          who.appendChild(meta);
+        }
+        head.appendChild(who);
+        card.appendChild(head);
+
+        const quote = document.createElement('blockquote');
+        quote.className = 'voice-quote';
+        quote.textContent = story.quote;
+        card.appendChild(quote);
+
+        if (story.body) {
+          const details = document.createElement('details');
+          details.className = 'voice-details';
+          const summary = document.createElement('summary');
+          summary.textContent = 'Tell us more';
+          const text = document.createElement('p');
+          text.textContent = story.body;
+          details.append(summary, text);
+          card.appendChild(details);
+        }
+        voiceGrid.appendChild(card);
+      }
+    };
+
+    apiFetch('/stories').then(({ ok, data }) => {
+      renderVoices(ok && data ? data.stories || [] : []);
     });
   }
 })();
