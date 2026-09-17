@@ -99,8 +99,16 @@
 
           <form class="idea-form" id="idea-form" hidden>
             <div class="idea-main">
-            <label for="idea-text">Your idea</label>
-            <textarea id="idea-text" rows="4" maxlength="200" placeholder="A picnic in the park when it gets warmer…"></textarea>
+              <label for="idea-text">Your idea</label>
+              <textarea id="idea-text" rows="4" maxlength="200" placeholder="A picnic in the park when it gets warmer…"></textarea>
+            </div>
+
+            <div class="idea-side">
+              <div class="join-field">
+                <label for="idea-name">Name <span class="join-optional">optional — leave empty to stay anonymous</span></label>
+                <input id="idea-name" maxlength="40" />
+              </div>
+            </div>
 
             <details class="idea-details" id="idea-details">
               <summary>Add details <span class="join-optional">optional — date, time, place</span></summary>
@@ -124,18 +132,11 @@
               </div>
               <label class="join-check"><input type="checkbox" id="idea-flexible" /> <span>The date is flexible — I am not fixed on a day</span></label>
             </details>
-            </div>
 
-            <div class="idea-side">
-              <div class="join-field">
-                <label for="idea-name">Name <span class="join-optional">optional — leave empty to stay anonymous</span></label>
-                <input id="idea-name" maxlength="40" />
-              </div>
-              <div class="idea-form-actions">
-                <button type="submit" class="finder-submit" id="idea-submit"><span class="finder-submit-label">Submit idea</span></button>
-                <button type="button" class="join-link" id="idea-cancel" hidden>Cancel edit</button>
-                <p class="join-hint join-hint--status" id="idea-hint"></p>
-              </div>
+            <div class="idea-form-actions">
+              <button type="submit" class="finder-submit" id="idea-submit"><span class="finder-submit-label">Submit idea</span></button>
+              <button type="button" class="join-link" id="idea-cancel" hidden>Cancel edit</button>
+              <p class="join-hint join-hint--status" id="idea-hint"></p>
             </div>
           </form>
           <p class="ideas-signin" id="ideas-signin">Want to add your idea? <a href="./join.html">Verify your email to join the directory</a> — ideas come from verified members.</p>

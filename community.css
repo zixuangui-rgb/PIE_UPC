@@ -361,7 +361,7 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .idea-form textarea, .idea-form input { width: 100%; padding: 12px 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 2px; color: var(--ink); font: 400 14px/1.6 var(--sans); resize: vertical; }
 .idea-form textarea:focus-visible, .idea-form input:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; border-color: var(--blue); }
 .idea-side .join-field { margin: 0; }
-.idea-form-actions { display: flex; align-items: center; gap: 14px 18px; flex-wrap: wrap; margin: 0; }
+.idea-form-actions { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px 18px; flex-wrap: wrap; padding-top: 22px; border-top: 1px solid var(--line); }
 .idea-form-actions .join-hint { margin: 0; }
 .ideas-signin { margin: 0; color: var(--secondary); font-size: 13px; line-height: 1.7; }
 .ideas-signin[hidden] { display: none; }
@@ -378,17 +378,22 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .idea-tag { padding: 4px 9px; border: 1px solid #e0e5ee; color: var(--secondary); font-size: 11px; line-height: 1.5; }
 .idea-delete + .idea-delete { margin-left: 14px; }
 .idea-delete:first-of-type { margin-left: auto; }
-.idea-details { margin: 18px 0 0; border-top: 1px solid var(--line); }
+.idea-details { grid-column: 1 / -1; margin: 4px 0 0; border-top: 1px solid var(--line); }
 .idea-details summary { padding: 14px 0 4px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--blue); }
 .idea-details[open] summary { padding-bottom: 14px; }
-.idea-details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 20px; margin-bottom: 4px; }
+.idea-details-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 22px; margin-bottom: 4px; }
 .idea-details .join-field label { font-size: 11.5px; }
 .idea-details .join-check { margin-top: 14px; }
 
-@media (max-width: 720px) {
+@media (max-width: 620px) {
   .idea-details-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 1100px) {
+  .idea-details-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 900px) {
   .idea-form { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .idea-details-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
