@@ -37,6 +37,12 @@
   const summaryEl = document.getElementById('finder-results-summary');
   const finderReady = !!(form && input && results && grid && noteEl);
 
+  // The full hint needs two comfortable lines on a phone; on the narrowest
+  // screens a shorter one keeps the composer tidy.
+  if (finderReady && window.matchMedia('(max-width: 420px)').matches) {
+    input.placeholder = "I'm new in Paris, studying biology…";
+  }
+
   // Production endpoint first; the local dev proxy is the fallback for development.
   const AI_ENDPOINTS = [
     'https://pie-recommend.zixuangui.workers.dev/recommend',

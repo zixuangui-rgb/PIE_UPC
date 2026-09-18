@@ -274,7 +274,9 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 @media (max-width: 720px) {
   .finder { padding: 52px 0 60px; }
   .finder-composer { flex-wrap: wrap; padding: 10px; }
-  .finder-composer textarea { flex-basis: 100%; min-height: 52px; }
+  /* box-sizing is border-box, so the 13px padding above and below is part of
+     the height: 84px leaves room for two wrapped lines of the placeholder. */
+  .finder-composer textarea { flex-basis: 100%; min-height: 84px; }
   .finder-submit { flex: 1; }
   .finder-grid { grid-template-columns: minmax(0, 1fr); }
   .finder-card h3 { font-size: 24px; }
