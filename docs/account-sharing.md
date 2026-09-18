@@ -30,15 +30,23 @@ site the way they normally would, and their PIE profile is already there.
 
 ```
 GET https://pie-recommend.zixuangui.workers.dev/member?email=<address>
-Header: X-PIE-Key: <shared key>
 ```
 
 | Response | Meaning |
 | --- | --- |
 | `200 {"found":true,"source":"pie-website","member":{…}}` | Known address — create or refresh the account with this |
 | `404 {"found":false}` | Unknown address — treat as a brand-new visitor |
-| `401 {"error":"bad key"}` | Wrong or missing key |
-| `503 {"error":"the directory bridge is not configured"}` | The bridge is switched off on the PIE side |
+| `429 {"error":"too many lookups…"}` | More than 30 lookups from one address in an hour |
+| `401 {"error":"bad key"}` | Only when a key is configured and it does not match |
+
+**No key is required.** Everything the endpoint returns is already published on
+the PIE members page — names, roles, countries, introductions, and the email
+addresses the members agreed to show — so a key would guard convenience, not a
+secret. Without one the endpoint answers anyone, capped at **30 lookups per
+address per hour**, which is enough for a whole room signing in and far too
+little to harvest a directory. Setting `PIE_DIRECTORY_KEY` on both sides is
+supported when the association would rather be asked by this one server alone;
+nothing else changes.
 
 The `member` object:
 
@@ -51,8 +59,8 @@ The `member` object:
 | `summary` | short self-introduction (`bio` on your side) |
 | `photo` | path to a portrait on the PIE site, or empty |
 
-Read-only, key-protected and never cached. The key is compared in constant time
-and the endpoint answers nothing without it, so the directory cannot be
+Read-only and never cached. When a key is configured it is compared in constant
+time; when none is, the hourly cap above is what keeps the directory from being
 enumerated.
 
 ## 2. What the community platform adds
@@ -63,14 +71,16 @@ so edits on the PIE side flow through):
 ```js
 // server/community-store.mjs
 async sharedProfile(email) {
-  const key = process.env.PIE_DIRECTORY_KEY;
-  if (!key) return null;
   const url = `https://pie-recommend.zixuangui.workers.dev/member?email=${encodeURIComponent(email)}`;
-  const response = await fetch(url, { headers: { 'X-PIE-Key': key } });
-  if (response.status === 404) return null;          // a stranger: nothing to copy
-  if (!response.ok) return null;                     // never block a sign-in on this
-  const { member } = await response.json();
-  return member;
+  const key = process.env.PIE_DIRECTORY_KEY;         // optional
+  try {
+    const response = await fetch(url, { headers: key ? { 'X-PIE-Key': key } : {} });
+    if (!response.ok) return null;                   // 404 stranger, 429 busy: nothing to copy
+    const { member } = await response.json();
+    return member;
+  } catch {
+    return null;                                     // never block a sign-in on this
+  }
 }
 ```
 
@@ -104,16 +114,13 @@ Rules worth keeping:
 
 ## 3. Configuration
 
-```bash
-# PIE side (one secret, then the endpoint is live)
-cd worker && wrangler secret put PIE_DIRECTORY_KEY
+Nothing to configure: the endpoint is live on the PIE side and the community
+platform only needs `PIE_DIRECTORY_URL` (already in `wrangler.example.toml`).
 
-# Community platform side
-wrangler secret put PIE_DIRECTORY_KEY      # the same value
-```
-
-While `PIE_DIRECTORY_KEY` is unset the endpoint answers `503` and every sign-in
-on your side behaves exactly as it does today — nothing breaks.
+Optionally, to make the directory answer this one server only, set the same
+`PIE_DIRECTORY_KEY` on both sides — `wrangler secret put PIE_DIRECTORY_KEY` — and
+the rate limit is replaced by the key check. Generating it with two halves sent
+over two different channels keeps the value out of any single transcript.
 
 ## 4. Trying it locally (no deployment)
 
@@ -138,7 +145,8 @@ Cases worth repeating against the real endpoint:
 | Address registered on the PIE side | `200` with the profile |
 | Address that only exists as a claimable PIE profile | `200` with the profile |
 | Unknown address | `404 {"found":false}` |
-| Missing or wrong `X-PIE-Key` | `401` |
+| More than 30 lookups in an hour | `429`, and sign-in still succeeds with an empty account |
+| `X-PIE-Key` when a key is configured but wrong | `401` |
 | Partner service down | sign-in still succeeds, account just not filled |
 
 ## 5. Appendix: the click-through handoff (built, not in use)

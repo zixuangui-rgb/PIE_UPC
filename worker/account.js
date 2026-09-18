@@ -28,6 +28,7 @@ const MAX_PHOTO_CHARS = 400 * 1024;   // base64 data URL cap (~300 KB image)
 const IDEA_LIMIT = 200;               // characters per idea
 const COMMENT_LIMIT = 500;            // characters per event comment
 const MAX_COMMENTS_PER_HOUR = 10;
+const MAX_LOOKUPS_PER_IP_HOUR = 30;   // only used when no shared key is configured
 const EVENT_ID = /^[a-z0-9][a-z0-9-]{0,39}$/;
 const EVENT_SCOPE = /^(all|\d{4}-\d{2}-\d{2})$/;
 const MAX_IDEAS_PER_HOUR = 5;
@@ -247,10 +248,22 @@ export async function handleAccount(request, env, url) {
   // and fills the new account with what comes back. Read-only, and only with
   // the shared key, so the directory is never open to enumeration.
   if (path === '/member' && request.method === 'GET') {
-    const provided = request.headers.get('X-PIE-Key') || '';
     const expected = env.PIE_DIRECTORY_KEY || '';
-    if (!expected) return json({ error: 'the directory bridge is not configured' }, 503);
-    if (!safeEqual(provided, expected)) return json({ error: 'bad key' }, 401);
+    if (expected) {
+      /* A key is configured, so only the partner server may ask. */
+      if (!safeEqual(request.headers.get('X-PIE-Key') || '', expected)) {
+        return json({ error: 'bad key' }, 401);
+      }
+    } else {
+      /* No key: the directory answers anyone, slowly enough that it cannot be
+         harvested. Everything it returns is already published on the members
+         page, so this guards traffic rather than a secret — which is why it can
+         be left off without weakening anything that was not already public. */
+      const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+      if (!(await bump(env, `member-ip:${ip}`, MAX_LOOKUPS_PER_IP_HOUR, 3600))) {
+        return json({ error: 'too many lookups — please try again later' }, 429);
+      }
+    }
     const email = clean(url.searchParams.get('email'), FIELD_LIMITS.email).toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ error: 'invalid email' }, 400);
 
