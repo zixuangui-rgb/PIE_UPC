@@ -568,10 +568,22 @@
       }
       ui.send.disabled = true;
       status(ui.emailHint, 'Sending the code…');
-      const { ok, data } = await apiFetch('/auth/code', { method: 'POST', body: JSON.stringify({ email }) });
+      // Campus wifi drops connections often enough that one silent retry is
+      // worth it: the failure that matters is the server answering "no".
+      let { ok, status: code, data } = await apiFetch('/auth/code', { method: 'POST', body: JSON.stringify({ email }) });
+      if (!ok && code === 0) {
+        status(ui.emailHint, 'The connection dropped — trying once more…');
+        await new Promise((done) => setTimeout(done, 1500));
+        ({ ok, status: code, data } = await apiFetch('/auth/code', { method: 'POST', body: JSON.stringify({ email }) }));
+      }
       ui.send.disabled = false;
       if (!ok) {
-        status(ui.emailHint, (data && data.error) || 'Could not send the code. Please try again.', 'error');
+        const message = (data && data.error)
+          || (code === 0
+            ? 'We could not reach the PIE service. Check your connection and try again — if a code arrives in the meantime, you can still use it below.'
+            : 'Could not send the code. Please try again in a moment.');
+        status(ui.emailHint, message, 'error');
+        if (code === 0) ui.codeStep.hidden = false;   // let an already-sent code be entered
         return;
       }
       ui.codeStep.hidden = false;
