@@ -1189,4 +1189,276 @@
       });
     });
   }
+  // ---------------------------------------------------------------------------
+  // Events page: who is coming, and what members say about each event.
+  // ---------------------------------------------------------------------------
+  const eventRows = Array.from(document.querySelectorAll('article.event-row[id]'));
+  if (eventRows.length) {
+    // A recurring event is scoped to its next occurrence, so the list resets.
+    const meetingDate = (() => {
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const first = (y, m) => { const d = new Date(y, m, 1); d.setDate(1 + ((4 - d.getDay() + 7) % 7)); return d; };
+      let next = first(today.getFullYear(), today.getMonth());
+      if (next < today) next = first(today.getFullYear(), today.getMonth() + 1);
+      return next.getFullYear() + '-' + String(next.getMonth() + 1).padStart(2, '0') + '-' + String(next.getDate()).padStart(2, '0');
+    })();
+    const scopeOf = (id) => (id === 'monthly-meeting' ? meetingDate : 'all');
+    const social = {};
+    let viewer = null;
+
+    const faces = (going) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'going-faces';
+      const shown = going.slice(0, 5);
+      for (const person of shown) {
+        if (person.photo) {
+          const img = document.createElement('img');
+          img.src = photoUrl(person.photo);
+          img.alt = person.name;
+          img.title = person.name;
+          img.loading = 'lazy';
+          wrap.appendChild(img);
+        } else {
+          const dot = document.createElement('span');
+          dot.className = 'going-dot';
+          dot.textContent = (person.name || '?').trim().charAt(0).toUpperCase();
+          dot.title = person.name;
+          wrap.appendChild(dot);
+        }
+      }
+      if (going.length > shown.length) {
+        const more = document.createElement('span');
+        more.className = 'going-dot going-dot--more';
+        more.textContent = '+' + (going.length - shown.length);
+        more.title = going.slice(5).map((p) => p.name).join(', ');
+        wrap.appendChild(more);
+      }
+      return wrap;
+    };
+
+    const commentNode = (comment) => {
+      const item = document.createElement('article');
+      item.className = 'comment';
+      const head = document.createElement('p');
+      head.className = 'comment-head';
+      if (comment.photo) {
+        const img = document.createElement('img');
+        img.className = 'comment-portrait';
+        img.src = photoUrl(comment.photo);
+        img.alt = '';
+        img.loading = 'lazy';
+        head.appendChild(img);
+      }
+      const who = document.createElement('span');
+      who.className = 'comment-who';
+      if (comment.authorGone) {
+        who.textContent = 'Deleted member';
+        who.classList.add('comment-who--gone');
+      } else if (comment.authorId) {
+        const link = document.createElement('a');
+        link.href = './members.html#' + comment.authorId;
+        link.textContent = comment.authorName || 'A member';
+        who.appendChild(link);
+      } else {
+        who.textContent = comment.authorName || 'A member';
+      }
+      head.appendChild(who);
+      const when = document.createElement('span');
+      when.className = 'comment-when';
+      when.textContent = new Date(comment.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+      head.appendChild(when);
+      if (comment.updatedAt) {
+        const edited = document.createElement('span');
+        edited.className = 'comment-when';
+        edited.textContent = '· edited';
+        head.appendChild(edited);
+      }
+      const body = document.createElement('p');
+      body.className = 'comment-text';
+      body.textContent = comment.text;
+      item.append(head, body);
+
+      if (viewer && comment.authorId === viewer.profileId) {
+        const tools = document.createElement('p');
+        tools.className = 'comment-tools';
+        const edit = document.createElement('button');
+        edit.type = 'button';
+        edit.className = 'idea-delete';
+        edit.textContent = 'Edit';
+        edit.addEventListener('click', () => startCommentEdit(comment, item));
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'idea-delete';
+        remove.textContent = 'Delete';
+        remove.addEventListener('click', async () => {
+          if (!window.confirm('Delete your comment?')) return;
+          const { ok } = await apiFetch('/comments/' + comment.id, { method: 'DELETE', headers: { Authorization: 'Bearer ' + session.token } });
+          if (ok) { social[comment.eventId].comments = social[comment.eventId].comments.filter((c) => c.id !== comment.id); paint(comment.eventId); }
+        });
+        tools.append(edit, remove);
+        item.appendChild(tools);
+      }
+      return item;
+    };
+
+    const startCommentEdit = (comment, item) => {
+      const box = item.querySelector('.comment-text');
+      const form = document.createElement('form');
+      form.className = 'comment-edit';
+      const input = document.createElement('textarea');
+      input.rows = 2;
+      input.maxLength = 500;
+      input.value = comment.text;
+      const actions = document.createElement('div');
+      actions.className = 'comment-edit-actions';
+      const save = document.createElement('button');
+      save.type = 'submit';
+      save.className = 'idea-delete';
+      save.textContent = 'Save';
+      const cancel = document.createElement('button');
+      cancel.type = 'button';
+      cancel.className = 'idea-delete';
+      cancel.textContent = 'Cancel';
+      cancel.addEventListener('click', () => paint(comment.eventId));
+      actions.append(save, cancel);
+      form.append(input, actions);
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const { ok, data } = await apiFetch('/comments/' + comment.id, {
+          method: 'POST',
+          headers: { Authorization: 'Bearer ' + session.token },
+          body: JSON.stringify({ text: input.value.trim() })
+        });
+        if (ok && data && data.comment) {
+          social[comment.eventId].comments = social[comment.eventId].comments.map((c) => (c.id === comment.id ? { ...c, ...data.comment } : c));
+          paint(comment.eventId);
+        }
+      });
+      box.replaceWith(form);
+      input.focus();
+    };
+
+    const paint = (eventId) => {
+      const row = document.getElementById(eventId);
+      const data = social[eventId];
+      if (!row || !data) return;
+      let block = row.querySelector('.event-social');
+      if (!block) {
+        block = document.createElement('div');
+        block.className = 'event-social';
+        row.appendChild(block);
+      }
+      block.innerHTML = '';
+
+      const join = document.createElement('div');
+      join.className = 'event-join';
+      const iAmGoing = viewer && data.going.some((p) => p.profileId === viewer.profileId);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'join-button' + (iAmGoing ? ' is-going' : '');
+      button.textContent = viewer ? (iAmGoing ? "✓ You're going" : 'Join this event') : 'Sign in to join';
+      button.addEventListener('click', async () => {
+        if (!viewer) { window.location.href = './join.html'; return; }
+        button.disabled = true;
+        const leaving = iAmGoing;
+        const { ok } = await apiFetch('/events/' + eventId + '/' + (leaving ? 'leave' : 'join'), {
+          method: 'POST',
+          headers: { Authorization: 'Bearer ' + session.token },
+          body: JSON.stringify({ scope: scopeOf(eventId) })
+        });
+        button.disabled = false;
+        if (!ok) return;
+        if (leaving) data.going = data.going.filter((p) => p.profileId !== viewer.profileId);
+        else data.going.push({ profileId: viewer.profileId, name: viewer.name, photo: viewer.photo, at: Date.now() });
+        paint(eventId);
+      });
+      join.appendChild(button);
+
+      const status = document.createElement('p');
+      status.className = 'going-count';
+      status.textContent = data.going.length
+        ? data.going.length + (data.going.length === 1 ? ' person is going' : ' people are going')
+        : 'Be the first to join';
+      join.appendChild(status);
+      if (data.going.length) join.appendChild(faces(data.going));
+      block.appendChild(join);
+
+      const comments = document.createElement('details');
+      comments.className = 'event-comments';
+      const summary = document.createElement('summary');
+      const count = data.comments.length;
+      summary.textContent = count ? count + (count === 1 ? ' comment' : ' comments') : 'Add a comment';
+      comments.appendChild(summary);
+      const list = document.createElement('div');
+      list.className = 'comment-list';
+      for (const comment of data.comments) list.appendChild(commentNode(comment));
+      if (!count) {
+        const none = document.createElement('p');
+        none.className = 'comment-none';
+        none.textContent = 'No comments yet — say something useful for the others.';
+        list.appendChild(none);
+      }
+      comments.appendChild(list);
+
+      if (viewer) {
+        const form = document.createElement('form');
+        form.className = 'comment-form';
+        const input = document.createElement('textarea');
+        input.rows = 2;
+        input.maxLength = 500;
+        input.placeholder = 'Add a comment…';
+        const actions = document.createElement('div');
+        actions.className = 'comment-form-actions';
+        const post = document.createElement('button');
+        post.type = 'submit';
+        post.className = 'finder-submit finder-submit--small';
+        const label = document.createElement('span');
+        label.className = 'finder-submit-label';
+        label.textContent = 'Post';
+        post.appendChild(label);
+        const hint = document.createElement('p');
+        hint.className = 'join-hint join-hint--status';
+        actions.append(post, hint);
+        form.append(input, actions);
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const text = input.value.trim();
+          if (text.length < 2) { hint.textContent = 'Please write something first.'; return; }
+          post.disabled = true;
+          const { ok, data: result } = await apiFetch('/events/' + eventId + '/comments', {
+            method: 'POST',
+            headers: { Authorization: 'Bearer ' + session.token },
+            body: JSON.stringify({ text })
+          });
+          post.disabled = false;
+          if (!ok || !result || !result.comment) { hint.textContent = (result && result.error) || 'Could not post.'; return; }
+          data.comments.push(result.comment);
+          paint(eventId);
+          const reopened = row.querySelector('.event-comments');
+          if (reopened) reopened.open = true;
+        });
+        form.appendChild(actions);
+        comments.appendChild(form);
+      } else {
+        const prompt = document.createElement('p');
+        prompt.className = 'comment-signin';
+        prompt.innerHTML = 'Only verified members can comment. <a href="./join.html">Verify your email</a>.';
+        comments.appendChild(prompt);
+      }
+      block.appendChild(comments);
+    };
+
+    const query = eventRows.map((row) => row.id + ':' + scopeOf(row.id)).join(',');
+    Promise.all([loadSession(), apiFetch('/events/social?events=' + encodeURIComponent(query))]).then(([active, result]) => {
+      if (active) {
+        const profile = active.profile || {};
+        viewer = { profileId: active.profileId || '', name: profile.name || active.email, photo: profile.photo || '' };
+      }
+      const data = (result.ok && result.data && result.data.events) || {};
+      for (const row of eventRows) {
+        social[row.id] = data[row.id] || { scope: scopeOf(row.id), going: [], comments: [] };
+        paint(row.id);
+      }
+    });
+  }
 })();

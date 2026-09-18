@@ -25,6 +25,10 @@ const CODE_COOLDOWN_SECONDS = 60;   // minimum gap between two requests for one 
 const MAX_CODES_PER_DAY = 200;      // protects the mail provider's daily quota
 const MAX_PHOTO_CHARS = 400 * 1024;   // base64 data URL cap (~300 KB image)
 const IDEA_LIMIT = 200;               // characters per idea
+const COMMENT_LIMIT = 500;            // characters per event comment
+const MAX_COMMENTS_PER_HOUR = 10;
+const EVENT_ID = /^[a-z0-9][a-z0-9-]{0,39}$/;
+const EVENT_SCOPE = /^(all|\d{4}-\d{2}-\d{2})$/;
 const MAX_IDEAS_PER_HOUR = 5;
 const MAX_IDEAS_PER_DAY = 20;
 const FIELD_LIMITS = { name: 60, role: 60, country: 40, summary: 320, tags: 8, tag: 30, email: 120 };
@@ -159,6 +163,15 @@ async function authorInfo(env, id) {
   if (!claimed) return null;
   const [role, country] = String(claimed.role || '').split(' · ');
   return { id: claimed.id, name: claimed.name, role: role || '', country: country || '', photo: claimed.photoPath || '' };
+}
+
+// Author lookups are repeated for every comment, so cache them per request.
+async function cachedAuthor(env, id, cache) {
+  if (!id) return null;
+  if (cache.has(id)) return cache.get(id);
+  const info = await authorInfo(env, id);
+  cache.set(id, info);
+  return info;
 }
 
 async function ownsIdea(env, session, record) {
@@ -379,6 +392,139 @@ export async function handleAccount(request, env, url) {
     await env.PIE_KV.delete(key.profile(id));
     await env.PIE_KV.delete(key.email(session.email));
     return json({ deleted: true });
+  }
+
+  // ---- event attendance and comments ---------------------------------------
+  // Attendance is keyed per member (rsvp:<event>:<scope>:<profileId>) so two
+  // people clicking at once cannot overwrite each other, and a repeated click
+  // is the same record. A recurring event carries the occurrence date as its
+  // scope, so a new month starts with an empty list.
+  if (path === '/events/social' && request.method === 'GET') {
+    const spec = clean(url.searchParams.get('events'), 600);
+    const wanted = [];
+    for (const pair of spec.split(',')) {
+      const [id, scope] = pair.split(':');
+      if (EVENT_ID.test(id || '') && EVENT_SCOPE.test(scope || '')) wanted.push([id, scope]);
+      if (wanted.length >= 12) break;
+    }
+    const authors = new Map();
+    const events = {};
+    for (const [id, scope] of wanted) {
+      const listed = await env.PIE_KV.list({ prefix: `rsvp:${id}:${scope}:` });
+      const going = [];
+      for (const entry of listed.keys) {
+        const record = JSON.parse((await env.PIE_KV.get(entry.name)) || 'null');
+        if (!record) continue;
+        const author = await cachedAuthor(env, record.profileId, authors);
+        going.push({
+          profileId: record.profileId,
+          name: (author && author.name) || record.name || 'A member',
+          photo: (author && author.photo) || '',
+          at: record.at || 0
+        });
+      }
+      going.sort((a, b) => a.at - b.at);
+
+      const listedComments = await env.PIE_KV.list({ prefix: `comment:${id}:` });
+      const comments = [];
+      for (const entry of listedComments.keys) {
+        const record = JSON.parse((await env.PIE_KV.get(entry.name)) || 'null');
+        if (!record) continue;
+        const author = await cachedAuthor(env, record.authorId, authors);
+        comments.push({
+          id: record.id,
+          text: record.text,
+          createdAt: record.createdAt,
+          updatedAt: record.updatedAt || 0,
+          authorId: record.authorId,
+          authorName: (author && author.name) || record.authorName || '',
+          photo: (author && author.photo) || '',
+          authorGone: !author
+        });
+      }
+      comments.sort((a, b) => a.createdAt - b.createdAt);
+      events[id] = { scope, going, comments };
+    }
+    return json({ events }, 200, { 'Cache-Control': 'no-store' });
+  }
+
+  const eventRoute = path.match(/^\/events\/([a-z0-9-]{1,40})\/(join|leave|comments)$/);
+  if (eventRoute && request.method === 'POST') {
+    const eventId = eventRoute[1];
+    const action = eventRoute[2];
+    const session = await sessionFrom(request, env);
+    if (!session) return json({ error: 'only verified members can take part' }, 401);
+    let body = {};
+    try { body = await request.json(); } catch { body = {}; }
+    const scope = clean(body.scope, 10) || 'all';
+    if (!EVENT_SCOPE.test(scope)) return json({ error: 'invalid scope' }, 400);
+    const profileId = await env.PIE_KV.get(key.email(session.email));
+    const claimed = findClaimableByEmail(session.email);
+    const me = profileId || (claimed ? claimed.id : '');
+    if (!me) return json({ error: 'please add your profile first' }, 400);
+
+    if (action === 'join' || action === 'leave') {
+      const rsvpKey = `rsvp:${eventId}:${scope}:${me}`;
+      if (action === 'leave') {
+        await env.PIE_KV.delete(rsvpKey);
+        return json({ joined: false });
+      }
+      const author = await cachedAuthor(env, me, new Map());
+      await env.PIE_KV.put(rsvpKey, JSON.stringify({
+        eventId,
+        scope,
+        profileId: me,
+        name: (author && author.name) || '',
+        at: Date.now()
+      }));
+      return json({ joined: true });
+    }
+
+    const text = clean(body.text, COMMENT_LIMIT);
+    if (text.length < 2) return json({ error: 'please write something first' }, 400);
+    if (!(await bump(env, `comment-email:${session.email}`, MAX_COMMENTS_PER_HOUR, 3600))) {
+      return json({ error: 'you have posted a lot just now, please try again later' }, 429);
+    }
+    const author = await cachedAuthor(env, me, new Map());
+    const record = {
+      id: 'c-' + randomToken().slice(0, 12),
+      eventId,
+      text,
+      authorId: me,
+      authorName: (author && author.name) || '',
+      createdAt: Date.now()
+    };
+    await env.PIE_KV.put(`comment:${eventId}:${record.id}`, JSON.stringify(record));
+    return json({ comment: { ...record, photo: (author && author.photo) || '', authorGone: false } });
+  }
+
+  // ---- edit or delete one's own comment ------------------------------------
+  if (path.startsWith('/comments/') && (request.method === 'POST' || request.method === 'DELETE')) {
+    const session = await sessionFrom(request, env);
+    if (!session) return json({ error: 'not signed in' }, 401);
+    const id = clean(path.slice('/comments/'.length), 40);
+    const listed = await env.PIE_KV.list({ prefix: 'comment:' });
+    let found = null;
+    for (const entry of listed.keys) {
+      if (!entry.name.endsWith(':' + id)) continue;
+      found = { key: entry.name, record: JSON.parse((await env.PIE_KV.get(entry.name)) || 'null') };
+      break;
+    }
+    if (!found || !found.record) return json({ error: 'comment not found' }, 404);
+    if (!(await ownsIdea(env, session, { authorId: found.record.authorId }))) {
+      return json({ error: 'you can only change your own comment' }, 403);
+    }
+    if (request.method === 'DELETE') {
+      await env.PIE_KV.delete(found.key);
+      return json({ deleted: true });
+    }
+    let body = {};
+    try { body = await request.json(); } catch { body = {}; }
+    const text = clean(body.text, COMMENT_LIMIT);
+    if (text.length < 2) return json({ error: 'please write something first' }, 400);
+    const updated = { ...found.record, text, updatedAt: Date.now() };
+    await env.PIE_KV.put(found.key, JSON.stringify(updated));
+    return json({ comment: updated });
   }
 
   // ---- member experiences: short quotes bound to their author ---------------
