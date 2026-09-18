@@ -433,6 +433,7 @@ export async function handleAccount(request, env, url) {
         const author = await cachedAuthor(env, record.authorId, authors);
         comments.push({
           id: record.id,
+          eventId: record.eventId || id,
           text: record.text,
           createdAt: record.createdAt,
           updatedAt: record.updatedAt || 0,

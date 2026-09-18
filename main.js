@@ -1236,7 +1236,7 @@
       return wrap;
     };
 
-    const commentNode = (comment) => {
+    const commentNode = (comment, eventId) => {
       const item = document.createElement('article');
       item.className = 'comment';
       const head = document.createElement('p');
@@ -1285,7 +1285,7 @@
         edit.type = 'button';
         edit.className = 'idea-delete';
         edit.textContent = 'Edit';
-        edit.addEventListener('click', () => startCommentEdit(comment, item));
+        edit.addEventListener('click', () => startCommentEdit(comment, item, eventId));
         const remove = document.createElement('button');
         remove.type = 'button';
         remove.className = 'idea-delete';
@@ -1293,7 +1293,10 @@
         remove.addEventListener('click', async () => {
           if (!window.confirm('Delete your comment?')) return;
           const { ok } = await apiFetch('/comments/' + comment.id, { method: 'DELETE', headers: { Authorization: 'Bearer ' + session.token } });
-          if (ok) { social[comment.eventId].comments = social[comment.eventId].comments.filter((c) => c.id !== comment.id); paint(comment.eventId); }
+          if (ok && social[eventId]) {
+            social[eventId].comments = social[eventId].comments.filter((c) => c.id !== comment.id);
+            paint(eventId);
+          }
         });
         tools.append(edit, remove);
         item.appendChild(tools);
@@ -1301,7 +1304,7 @@
       return item;
     };
 
-    const startCommentEdit = (comment, item) => {
+    const startCommentEdit = (comment, item, eventId) => {
       const box = item.querySelector('.comment-text');
       const form = document.createElement('form');
       form.className = 'comment-edit';
@@ -1319,7 +1322,7 @@
       cancel.type = 'button';
       cancel.className = 'idea-delete';
       cancel.textContent = 'Cancel';
-      cancel.addEventListener('click', () => paint(comment.eventId));
+      cancel.addEventListener('click', () => paint(eventId));
       actions.append(save, cancel);
       form.append(input, actions);
       form.addEventListener('submit', async (event) => {
@@ -1329,9 +1332,9 @@
           headers: { Authorization: 'Bearer ' + session.token },
           body: JSON.stringify({ text: input.value.trim() })
         });
-        if (ok && data && data.comment) {
-          social[comment.eventId].comments = social[comment.eventId].comments.map((c) => (c.id === comment.id ? { ...c, ...data.comment } : c));
-          paint(comment.eventId);
+        if (ok && data && data.comment && social[eventId]) {
+          social[eventId].comments = social[eventId].comments.map((c) => (c.id === comment.id ? { ...c, ...data.comment, eventId } : c));
+          paint(eventId);
         }
       });
       box.replaceWith(form);
@@ -1393,7 +1396,7 @@
       comments.appendChild(summary);
       const list = document.createElement('div');
       list.className = 'comment-list';
-      for (const comment of data.comments) list.appendChild(commentNode(comment));
+      for (const comment of data.comments) list.appendChild(commentNode(comment, eventId));
       if (!count) {
         const none = document.createElement('p');
         none.className = 'comment-none';
