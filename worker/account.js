@@ -14,6 +14,7 @@
 // so the flow can be tested end to end.
 
 import { CLAIMABLE, findClaimableByEmail, findClaimableById } from './claimable.js';
+import { buildHandoffUrl, handoffClaims, HANDOFF_TTL_SECONDS } from './handoff.js';
 
 const CODE_TTL = 600;            // 10 minutes
 const SESSION_TTL = 60 * 60 * 24 * 30;
@@ -201,7 +202,29 @@ export async function handleAccount(request, env, url) {
 
   // ---- service configuration (used by the join page to explain the flow) ----
   if (path === '/config' && request.method === 'GET') {
-    return json({ emailEnabled: !!env.BREVO_API_KEY });
+    return json({
+      emailEnabled: !!env.BREVO_API_KEY,
+      platformReady: !!(env.PLATFORM_URL && env.PIE_HANDOFF_SECRET),
+      platformName: clean(env.PLATFORM_NAME, 60) || 'the community platform'
+    });
+  }
+
+  // ---- hand a signed-in member over to the community platform ---------------
+  if (path === '/handoff' && request.method === 'POST') {
+    const session = await sessionFrom(request, env);
+    if (!session) return json({ error: 'sign in first' }, 401);
+    if (!env.PLATFORM_URL || !env.PIE_HANDOFF_SECRET) {
+      return json({ error: 'the community platform is not connected yet' }, 503);
+    }
+    const profileId = await env.PIE_KV.get(key.email(session.email));
+    const own = profileId ? await loadProfile(env, profileId) : null;
+    const claimed = findClaimableByEmail(session.email);
+    const profile = own || claimed || null;
+    const claims = handoffClaims(profile, session.email);
+    const url = await buildHandoffUrl(env, claims);
+    // Recorded so a ticket can be recognised again by this side while it lives.
+    await env.PIE_KV.put(`handoff:${claims.jti}`, JSON.stringify({ email: claims.email, exp: claims.exp }), { expirationTtl: HANDOFF_TTL_SECONDS + 60 });
+    return json({ url, expiresIn: HANDOFF_TTL_SECONDS });
   }
 
   // ---- request a verification code -----------------------------------------

@@ -445,3 +445,15 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 .voice-tools .idea-delete { margin: 0; }
 .voice-identity { margin: 0; color: var(--secondary); font-size: 13px; line-height: 1.6; }
 .voice-details { margin-top: 18px; }
+
+/* Handoff strip: one offer to continue on the community platform. */
+.platform { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 28px 40px; align-items: center; margin: 0 0 46px; padding: clamp(24px, 2.6vw, 34px); background: #fff; border: 1px solid var(--line); }
+.platform[hidden] { display: none; }
+.platform h2 { margin: 8px 0 12px; font: 400 clamp(24px, 2.2vw, 32px)/1.15 var(--serif); letter-spacing: -.015em; }
+.platform-lead { margin: 0; max-width: 46ch; color: var(--secondary); font-size: 14px; line-height: 1.75; }
+.platform-action { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.platform-action .join-hint { margin: 0; }
+
+@media (max-width: 860px) {
+  .platform { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+}

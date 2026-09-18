@@ -5,3 +5,10 @@ compatibility_date = "2026-09-01"
 [[kv_namespaces]]
 binding = "PIE_KV"
 id = "15c7b7ec698241599436c867928c837d"
+
+[vars]
+# Account handoff to the other group's community platform. PLATFORM_URL stays
+# empty until their site is live: while it is empty the "continue with my
+# account" button on the events page hides itself and /handoff answers 503.
+PLATFORM_URL = ""
+PLATFORM_NAME = "the community platform"
