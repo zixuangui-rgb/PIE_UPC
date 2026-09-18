@@ -19,10 +19,11 @@ import { buildHandoffUrl, handoffClaims, HANDOFF_TTL_SECONDS } from './handoff.j
 const CODE_TTL = 600;            // 10 minutes
 const SESSION_TTL = 60 * 60 * 24 * 30;
 const MAX_ATTEMPTS = 5;
-const MAX_CODE_PER_EMAIL_HOUR = 3;
-const MAX_CODE_PER_IP_HOUR = 30;   // a whole campus network can share one public IP
-const CODE_COOLDOWN_SECONDS = 60;   // minimum gap between two requests for one address
-const MAX_CODES_PER_DAY = 200;      // protects the mail provider's daily quota
+const MAX_CODE_PER_EMAIL_HOUR = 6;    // plenty for a retry or a resend
+const MAX_CODE_PER_IP_HOUR = 200;     // a whole room shares one campus IP during a demo
+const MAX_CODE_PER_IP_MINUTE = 60;    // stops a runaway client without blocking an audience
+const CODE_COOLDOWN_SECONDS = 30;     // minimum gap between two requests for one address
+const MAX_CODES_PER_DAY = 280;        // the mail provider's free plan stops at 300
 const MAX_PHOTO_CHARS = 400 * 1024;   // base64 data URL cap (~300 KB image)
 const IDEA_LIMIT = 200;               // characters per idea
 const COMMENT_LIMIT = 500;            // characters per event comment
@@ -54,11 +55,20 @@ const key = {
   rate: (bucket) => `rate:${bucket}`
 };
 
+// Best-effort counter. KV refuses concurrent writes to one key, and a burst of
+// sign-ups all touch the same per-IP and daily buckets: when that write fails
+// the request is allowed rather than failed, because a lost count must never
+// stand between a member and their sign-in code. The limits therefore hold
+// exactly under normal traffic and loosen, never tighten, under load.
 async function bump(env, bucket, limit, ttl) {
-  const current = Number(await env.PIE_KV.get(key.rate(bucket))) || 0;
-  if (current >= limit) return false;
-  await env.PIE_KV.put(key.rate(bucket), String(current + 1), { expirationTtl: ttl });
-  return true;
+  try {
+    const current = Number(await env.PIE_KV.get(key.rate(bucket))) || 0;
+    if (current >= limit) return false;
+    await env.PIE_KV.put(key.rate(bucket), String(current + 1), { expirationTtl: Math.max(60, ttl) });
+    return true;
+  } catch (err) {
+    return true;
+  }
 }
 
 function randomCode() {
@@ -247,17 +257,24 @@ export async function handleAccount(request, env, url) {
     const email = clean(body.email, FIELD_LIMITS.email).toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ error: 'invalid email' }, 400);
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-    if (await env.PIE_KV.get(`cooldown:${email}`)) {
-      return json({ error: 'a code was just sent — please wait a minute before requesting another one' }, 429);
+    // KV refuses an expirationTtl below 60 seconds, so the cooldown length is
+    // kept in the value and the key itself simply lives a little longer.
+    const cooldownUntil = Number(await env.PIE_KV.get(`cooldown:${email}`)) || 0;
+    if (cooldownUntil > Date.now()) {
+      return json({ error: 'a code was just sent — please wait a moment before asking for another one' }, 429);
     }
     if (!(await bump(env, `code-email:${email}`, MAX_CODE_PER_EMAIL_HOUR, 3600))) return json({ error: 'too many codes for this address, try later' }, 429);
+    if (!(await bump(env, `code-ip-minute:${ip}`, MAX_CODE_PER_IP_MINUTE, 60))) return json({ error: 'too many requests just now, please try again in a minute' }, 429);
     if (!(await bump(env, `code-ip:${ip}`, MAX_CODE_PER_IP_HOUR, 3600))) return json({ error: 'too many requests, try later' }, 429);
     if (!(await bump(env, `code-daily:${new Date().toISOString().slice(0, 10)}`, MAX_CODES_PER_DAY, 86400))) {
       return json({ error: 'the daily verification limit has been reached, please try again tomorrow' }, 429);
     }
-    const code = randomCode();
+    // A second request inside the code's lifetime keeps the SAME code: a
+    // duplicated email then carries one answer, not two that disagree.
+    const open = JSON.parse((await env.PIE_KV.get(key.code(email))) || 'null');
+    const code = open && open.code ? open.code : randomCode();
     await env.PIE_KV.put(key.code(email), JSON.stringify({ code, attempts: 0 }), { expirationTtl: CODE_TTL });
-    await env.PIE_KV.put(`cooldown:${email}`, '1', { expirationTtl: CODE_COOLDOWN_SECONDS });
+    await env.PIE_KV.put(`cooldown:${email}`, String(Date.now() + CODE_COOLDOWN_SECONDS * 1000), { expirationTtl: 120 });
     try {
       const result = await sendCode(env, email, code);
       const known = findClaimableByEmail(email);

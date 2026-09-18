@@ -54,7 +54,18 @@ Every page asks the service once (`GET /me`) when a session token is present and
 
 ## Limits and protections
 
-- Code lifetime 10 minutes, at most 5 attempts, at most 3 codes per address per hour and 10 per IP per hour.
+- Code lifetime 10 minutes, at most 5 wrong attempts per code.
+- Sending a code again inside its lifetime reuses the same code, so a duplicate email cannot leave someone holding two answers.
+- Limits, sized for a live demo where the whole room shares one campus IP:
+
+  | Limit | Value |
+  | --- | --- |
+  | Codes per email | 6 / hour |
+  | Cooldown per email | 30 s |
+  | Codes per IP | 200 / hour, 60 / minute |
+  | Codes overall | 280 / day (the mail provider's free plan stops at 300) |
+
+  The counters are best-effort by design: Cloudflare KV refuses concurrent writes to one key, and a counter that cannot be written lets the request through instead of failing it. The limits bind under normal traffic and loosen, never tighten, under a burst.
 - Session tokens are 32 random bytes, valid for 30 days.
 - Field limits: name 60, role 60, country 40, summary 320, eight tags of 30 characters, photo 400 KB.
 - Server strips angle brackets and caps every value before it is stored.
