@@ -1348,6 +1348,8 @@
         block.className = 'event-social';
         row.appendChild(block);
       }
+      // Whatever the member had open stays open when the block is redrawn.
+      const wasOpen = !!row.querySelector('.event-comments[open]');
       block.innerHTML = '';
 
       const join = document.createElement('div');
@@ -1446,6 +1448,7 @@
         comments.appendChild(prompt);
       }
       block.appendChild(comments);
+      comments.open = wasOpen;
     };
 
     const query = eventRows.map((row) => row.id + ':' + scopeOf(row.id)).join(',');
