@@ -553,7 +553,8 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
   .member-contact dt, .gateway-number, .story-meta, .preview-event-meta, .idea-role { font-size: 12px; }
   .event-category, .event-status { font-size: 11.5px; }
   .event-date small { font-size: 11px; }
-  .event-badge { font-size: 10.5px; }
+  .event-badge, .preview-event-type { font-size: 11px; }
+  .preview-story-author div > span, .preview-story-author > span > span, .preview-event-meta { font-size: 11px; }
 
   /* Remaining small targets: standalone links and the checkbox row. */
   .join-cta { min-height: 44px; display: inline-flex; align-items: center; font-size: 13px; }
