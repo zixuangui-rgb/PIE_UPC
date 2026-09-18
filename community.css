@@ -514,8 +514,9 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 @media (max-width: 720px) {
   /* Header: keep three tidy rows but make every row comfortable to tap. */
   .inner-page .masthead { padding: 18px 0; gap: 8px 14px; }
+  .wordmark, .masthead .wordmark { min-height: 44px; align-items: center; justify-content: center; }
   .site-nav { gap: 4px 18px; }
-  .site-nav a { min-height: 44px; font-size: 12.5px; }
+  .site-nav a { min-height: 44px; padding-inline: 4px; font-size: 12.5px; }
   .site-nav-account { font-size: 13px; }
   .masthead-join { min-height: 44px; display: inline-flex; align-items: center; font-size: 13px; padding-bottom: 0; border-bottom: 0; }
   .masthead-side { gap: 14px; }
