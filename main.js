@@ -1362,17 +1362,23 @@
       button.type = 'button';
       button.className = 'join-button' + (iAmGoing ? ' is-going' : '');
       button.textContent = viewer ? (iAmGoing ? "✓ You're going" : 'Join this event') : 'Sign in to join';
+      const joinNote = document.createElement('p');
+      joinNote.className = 'join-note';
       button.addEventListener('click', async () => {
         if (!viewer) { window.location.href = './join.html'; return; }
         button.disabled = true;
+        joinNote.textContent = '';
         const leaving = iAmGoing;
-        const { ok } = await apiFetch('/events/' + eventId + '/' + (leaving ? 'leave' : 'join'), {
+        const { ok, data: result } = await apiFetch('/events/' + eventId + '/' + (leaving ? 'leave' : 'join'), {
           method: 'POST',
           headers: { Authorization: 'Bearer ' + session.token },
           body: JSON.stringify({ scope: scopeOf(eventId) })
         });
         button.disabled = false;
-        if (!ok) return;
+        if (!ok) {
+          joinNote.textContent = (result && result.error) || 'That did not go through — please try again.';
+          return;
+        }
         if (leaving) data.going = data.going.filter((p) => p.profileId !== viewer.profileId);
         else data.going.push({ profileId: viewer.profileId, name: viewer.name, photo: viewer.photo, at: Date.now() });
         paint(eventId);
@@ -1385,6 +1391,7 @@
         ? data.going.length + (data.going.length === 1 ? ' person is going' : ' people are going')
         : 'Be the first to join';
       join.appendChild(status);
+      join.appendChild(joinNote);
       if (data.going.length) join.appendChild(faces(data.going));
       block.appendChild(join);
 
