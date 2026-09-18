@@ -90,4 +90,6 @@ export default {
   }
 };
 
-export { SYSTEM_PROMPT, CATALOG_IDS, buildDynamicLines, buildStoryLines };
+// Module exports were removed on purpose: the Workers runtime rejects plain
+// values (a string prompt, a Set) as module exports, and nothing imports them
+// from here — the tests read worker/recommend.js directly.

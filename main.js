@@ -1168,53 +1168,6 @@
       }
     });
   }
-  // ---------------------------------------------------------------------------
-  // Events page: carry the signed-in member over to the community platform.
-  // ---------------------------------------------------------------------------
-  const platformStrip = document.getElementById('platform-strip');
-  if (platformStrip) {
-    const goButton = document.getElementById('platform-go');
-    const platformHint = document.getElementById('platform-hint');
-    const label = goButton.querySelector('.finder-submit-label');
-    const setPlatformHint = (message, kind) => {
-      platformHint.textContent = message || '';
-      platformHint.className = 'join-hint join-hint--status' + (kind ? ' is-' + kind : '');
-    };
-
-    Promise.all([loadSession(), apiFetch('/config')]).then(([active, config]) => {
-      const ready = !!(config.ok && config.data && config.data.platformReady);
-      if (!ready) return;                     // nothing to offer until the platform is connected
-      platformStrip.hidden = false;
-
-      if (!active) {
-        label.textContent = 'Verify your email first';
-        goButton.addEventListener('click', () => { window.location.href = './join.html'; });
-        setPlatformHint('The handoff carries a verified PIE account, so sign in first.');
-        return;
-      }
-
-      goButton.addEventListener('click', async () => {
-        goButton.disabled = true;
-        setPlatformHint('Preparing your account…');
-        const { ok, data } = await apiFetch('/handoff', {
-          method: 'POST',
-          headers: { Authorization: 'Bearer ' + session.token },
-          body: '{}'
-        });
-        goButton.disabled = false;
-        if (!ok || !data || !data.url) {
-          setPlatformHint((data && data.error) || 'Could not prepare the handoff.', 'error');
-          return;
-        }
-        label.textContent = 'Taking you there…';
-        setPlatformHint('Opening the community platform — you stay signed in.', 'ok');
-        window.location.href = data.url;
-      });
-    });
-  }
-  // ---------------------------------------------------------------------------
-  // Events page: who is coming, and what members say about each event.
-  // ---------------------------------------------------------------------------
   const eventRows = Array.from(document.querySelectorAll('article.event-row[id]'));
   if (eventRows.length) {
     // A recurring event is scoped to its next occurrence, so the list resets.

@@ -184,6 +184,16 @@ async function cachedAuthor(env, id, cache) {
   return info;
 }
 
+// Constant-time compare so the key cannot be guessed a character at a time.
+function safeEqual(a, b) {
+  const left = String(a);
+  const right = String(b);
+  if (left.length !== right.length) return false;
+  let diff = 0;
+  for (let i = 0; i < left.length; i += 1) diff |= left.charCodeAt(i) ^ right.charCodeAt(i);
+  return diff === 0;
+}
+
 async function ownsIdea(env, session, record) {
   if (!record || !record.authorId) return false;
   const profileId = await env.PIE_KV.get(key.email(session.email));
@@ -230,6 +240,47 @@ export async function handleAccount(request, env, url) {
       platformReady: !!(env.PLATFORM_URL && env.PIE_HANDOFF_SECRET),
       platformName: clean(env.PLATFORM_NAME, 60) || 'the community platform'
     });
+  }
+
+  // ---- directory lookup for the partner site --------------------------------
+  // Their server asks "do you know this address?" when someone signs in there,
+  // and fills the new account with what comes back. Read-only, and only with
+  // the shared key, so the directory is never open to enumeration.
+  if (path === '/member' && request.method === 'GET') {
+    const provided = request.headers.get('X-PIE-Key') || '';
+    const expected = env.PIE_DIRECTORY_KEY || '';
+    if (!expected) return json({ error: 'the directory bridge is not configured' }, 503);
+    if (!safeEqual(provided, expected)) return json({ error: 'bad key' }, 401);
+    const email = clean(url.searchParams.get('email'), FIELD_LIMITS.email).toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ error: 'invalid email' }, 400);
+
+    const profileId = await env.PIE_KV.get(key.email(email));
+    const own = profileId ? await loadProfile(env, profileId) : null;
+    const claimed = own ? null : findClaimableByEmail(email);
+    const profile = own || claimed;
+    if (!profile) return json({ found: false }, 404);
+
+    // A registered profile keeps role and country apart; the built-in registry
+    // stores them together as "Role · Country".
+    const [role, country] = own
+      ? [profile.role || '', profile.country || '']
+      : String(profile.role || '').split(' · ').map((part) => part.trim());
+    const uploaded = typeof profile.photo === 'string' && profile.photo.startsWith('data:');
+    return json({
+      found: true,
+      source: 'pie-website',
+      member: {
+        id: profile.id,
+        email,
+        name: profile.name || '',
+        country: country || '',
+        city: 'Paris',
+        role: role || '',
+        tags: Array.isArray(profile.tags) ? profile.tags.filter(Boolean).slice(0, 8) : [],
+        summary: profile.summary || '',
+        photo: uploaded ? `/photo/${profile.id}` : (profile.photoPath || profile.photo || '')
+      }
+    }, 200, { 'Cache-Control': 'no-store' });
   }
 
   // ---- hand a signed-in member over to the community platform ---------------
