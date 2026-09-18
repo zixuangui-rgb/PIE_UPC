@@ -183,11 +183,16 @@
   function renderAi(data) {
     grid.innerHTML = '';
     let shown = 0;
+    const seen = new Set();
     for (const kind of ['member', 'event', 'story']) {
       const p = data[kind];
       if (!p || !p.id) continue;
       const entry = POOL_BY_KIND[kind].find((e) => e.id === p.id);
       if (!entry) continue;
+      // Safety net: one card per person, whatever the service sent back.
+      const who = (entry.name || '').trim().toLowerCase();
+      if (who && seen.has(who)) continue;
+      if (who) seen.add(who);
       grid.insertAdjacentHTML('beforeend', cardHtml(kind, entry, p.reason));
       shown += 1;
     }
