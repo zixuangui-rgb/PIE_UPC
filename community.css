@@ -505,3 +505,51 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 
 .join-note { flex-basis: 100%; margin: 2px 0 0; color: #a3342f; font-size: 12px; }
 .join-note:empty { display: none; }
+
+/* ---------------------------------------------------------------------------
+   Mobile refinements. Everything here is inside a max-width query, so the
+   desktop layout is untouched: bigger touch targets (44px), readable type and
+   form fields at 16px so iOS does not zoom when one is focused.
+   --------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  /* Header: keep three tidy rows but make every row comfortable to tap. */
+  .inner-page .masthead { padding: 18px 0; gap: 8px 14px; }
+  .site-nav { gap: 4px 18px; }
+  .site-nav a { min-height: 44px; font-size: 12.5px; }
+  .site-nav-account { font-size: 13px; }
+  .masthead-join { min-height: 44px; display: inline-flex; align-items: center; font-size: 13px; padding-bottom: 0; border-bottom: 0; }
+  .masthead-side { gap: 14px; }
+
+  /* Anything tappable that was sized for a mouse. */
+  .scroll-cue { min-height: 44px; font-size: 12.5px; }
+  .gateway-sub { min-height: 44px; display: inline-flex; align-items: center; font-size: 12.5px; }
+  .finder-example { min-height: 44px; padding: 10px 16px; font-size: 13px; }
+  .event-comments > summary, .voice-details summary, .post-details summary, .share-trigger { min-height: 44px; display: flex; align-items: center; }
+  .share-trigger { padding: 14px 18px; }
+  .idea-delete, .comment-tools button { min-height: 44px; display: inline-flex; align-items: center; font-size: 12.5px; }
+  .comment-tools { gap: 18px; }
+  .idea-card .idea-meta { gap: 14px; }
+  .site-footer { font-size: 12px; gap: 10px 18px; }
+  .site-footer a { min-height: 44px; display: inline-flex; align-items: center; }
+  .member-contact a, .voice-name a, .idea-meta a, .comment-who a { min-height: 24px; display: inline-flex; align-items: center; }
+
+  /* Forms: 16px keeps iOS from zooming the page on focus. */
+  .post-form textarea, .post-form input:not([type="checkbox"]),
+  .comment-form textarea, .comment-edit textarea,
+  .join-field input, .join-field textarea, .join-field select,
+  .finder-input, #finder-input, textarea#voice-quote, textarea#idea-text {
+    font-size: 16px;
+  }
+  .post-main > label, .post-form .join-field label, .join-field label { font-size: 12px; }
+  .finder-submit { min-height: 48px; }
+  .join-step .finder-submit { width: 100%; justify-content: center; }
+  .join-link { min-height: 44px; display: inline-flex; align-items: center; }
+
+  /* Type that was tuned for a wide screen reads too small on a phone. */
+  .demo-note, .finder-privacy, .ideas-lead, .voices-empty, .comment-head, .comment-signin,
+  .going-count, .idea-tag, .voice-place, .idea-meta, .preview-story-author, .event-meta { font-size: 12.5px; }
+  .event-date small { font-size: 10px; }
+  .event-badge { font-size: 9.5px; }
+  .card-summary, .idea-card p, .comment-text { font-size: 15px; }
+  .page-lead { font-size: 14.5px; }
+}
