@@ -547,9 +547,21 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline
 
   /* Type that was tuned for a wide screen reads too small on a phone. */
   .demo-note, .finder-privacy, .ideas-lead, .voices-empty, .comment-head, .comment-signin,
-  .going-count, .idea-tag, .voice-place, .idea-meta, .preview-story-author, .event-meta { font-size: 12.5px; }
-  .event-date small { font-size: 10px; }
-  .event-badge { font-size: 9.5px; }
+  .going-count, .idea-tag, .voice-place, .idea-meta, .preview-story-author, .event-meta,
+  .member-role, .member-status, .tag-list li, .preview-person span, .voice-role,
+  .member-contact dt, .gateway-number, .story-meta, .preview-event-meta, .idea-role { font-size: 12px; }
+  .event-category, .event-status { font-size: 11.5px; }
+  .event-date small { font-size: 11px; }
+  .event-badge { font-size: 10.5px; }
+
+  /* Remaining small targets: standalone links and the checkbox row. */
+  .join-cta { min-height: 44px; display: inline-flex; align-items: center; font-size: 13px; }
+  .member-you-edit { min-height: 44px; display: inline-flex; align-items: center; font-size: 12.5px; }
+  .voice-name a, .member-contact dd a { min-height: 44px; display: inline-flex; align-items: center; }
+  .join-check { min-height: 44px; }
+  .idea-delete { padding-inline: 6px; }
+  .voice-you { font-size: 11px; padding: 5px 10px; }
+  .member-status { padding: 4px 10px; }
   .card-summary, .idea-card p, .comment-text { font-size: 15px; }
   .page-lead { font-size: 14.5px; }
 }
